@@ -1,0 +1,131 @@
+ * {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+ }
+
+ body {
+   font-family: system-ui, sans-serif;
+   background: #111;
+   color: #eee;
+   display: flex;
+   justify-content: center;
+   align-items: flex-start;
+   height: 100vh;
+   overflow: hidden;
+   gap: 32px;
+   padding: 24px;
+ }
+
+ #ui {
+   width: 320px;
+   max-height: calc(100vh - 48px);
+   /* odejmujemy padding body */
+   overflow: auto;
+   background: #1a1a1a;
+   padding: 20px;
+   border-radius: 12px;
+   box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+ }
+
+ canvas {
+   background: #222;
+   border: 1px solid #444;
+   border-radius: 8px;
+   box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+ }
+
+ #desc {
+   width: 340px;
+   max-height: calc(100vh - 48px);
+   /* odejmujemy padding body */
+   font-size: 14px;
+   line-height: 1.5;
+   color: #bbb;
+   overflow-y: auto;
+   padding-right: 8px;
+ }
+
+ h2 {
+   margin-bottom: 16px;
+   font-weight: 600;
+ }
+
+ .stat {
+   margin: 8px 0;
+ }
+
+ .pill {
+   background: #333;
+   padding: 6px 10px;
+   border-radius: 6px;
+   display: inline-block;
+   margin-right: 8px;
+   font-size: 13px;
+ }
+
+ /* wyróżnienie wartości najlepszego fitnessu */
+ .pill b#best {
+   color: #ffd166;
+   font-weight: 700;
+   display: inline-block;
+   min-width: 64px;
+   text-align: right;
+ }
+
+ /* histogram rozkładu fitnessu */
+ #hist {
+   width: 100%;
+   height: 96px;
+   border: 1px solid #333;
+   border-radius: 6px;
+   background: #0b0b0b;
+   display: block;
+ }
+
+ label {
+   display: block;
+   margin: 12px 0 6px;
+   font-size: 14px;
+   color: #ccc;
+ }
+
+ input[type=range] {
+   width: 100%;
+ }
+
+ button {
+   padding: 8px 14px;
+   background: #444;
+   color: #eee;
+   border: none;
+   border-radius: 6px;
+   cursor: pointer;
+   margin-right: 8px;
+   transition: background 0.2s;
+ }
+
+ button:hover {
+   background: #666;
+ }
+
+ select {
+   width: 100%;
+   padding: 6px;
+   border-radius: 6px;
+   border: none;
+   background: #333;
+   color: #eee;
+ }
+
+ #desc h3 {
+   margin-top: 18px;
+   margin-bottom: 8px;
+   color: #eee;
+   font-size: 15px;
+ }
+
+ #desc ul {
+   margin-left: 18px;
+   color: #aaa;
+ }
