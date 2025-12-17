@@ -46,6 +46,27 @@ const btnPause = document.getElementById('pause');
 const selMethodEl = document.getElementById('selMethod');
 const showTrailsEl = document.getElementById('showTrails');
 
+// NOWE: element pokazujący sumę fitness po sharingu (totalFit)
+const totalFitEl = document.getElementById('totalFit');
+
+// --- NOWE: kontrolki turniejowe ---
+const tournamentSizeEl = document.getElementById('tournamentSize');
+const tournamentSizeValEl = document.getElementById('tournamentSizeVal');
+const tournamentNoReplaceEl = document.getElementById('tournamentNoReplace');
+// domyślna wartość (zgodna z dotychczasowym zachowaniem)
+let TOURNAMENT_K = tournamentSizeEl ? Number(tournamentSizeEl.value) : 5;
+let TOURNAMENT_NO_REPLACE = tournamentNoReplaceEl ? tournamentNoReplaceEl.checked : false;
+
+if (tournamentSizeEl) {
+  tournamentSizeEl.oninput = () => {
+    TOURNAMENT_K = Math.max(2, Math.min(population.length || 100, Number(tournamentSizeEl.value)));
+    tournamentSizeValEl.textContent = TOURNAMENT_K;
+  };
+}
+if (tournamentNoReplaceEl) {
+  tournamentNoReplaceEl.onchange = () => { TOURNAMENT_NO_REPLACE = tournamentNoReplaceEl.checked; };
+}
+
 // Obsługa UI
 dnaLenEl.oninput = () => { DNA_LEN = +dnaLenEl.value; dnaLenValEl.textContent = DNA_LEN; resetPopulation(); };
 mutRateEl.oninput = () => { MUT_RATE = +mutRateEl.value / 100; mutRateValEl.textContent = Math.round(MUT_RATE * 100) + '%'; };
@@ -278,7 +299,9 @@ function mutate(dna) {
 // Wybór rodzica zależnie od ustawienia w UI: 'roulette', 'tournament', 'rank'
 function pickParent(method, population, totalFit) {
   if (method === 'roulette') return pickRoulette(population, totalFit);
-  if (method === 'tournament') return pickTournament(population, 5); // turniej z 5 uczestnikami
+  // używamy dynamicznej wartości TOURNAMENT_K pobranej z UI
+  // uwaga: pickTournament zawsze zwraca jeden zwycięzcę (number of winners = 1)
+  if (method === 'tournament') return pickTournament(population, TOURNAMENT_K, TOURNAMENT_NO_REPLACE);
   if (method === 'rank') return pickRank(population);
   return pickRoulette(population, totalFit);
 }
@@ -297,11 +320,29 @@ function pickRoulette(population, totalFit) {
 }
 
 // 2) Turniej: losujemy k osobników i wybieramy najlepszego
-function pickTournament(population, k = 3) {
+// pool: losujemy k kandydatów (pula = TOURNAMENT_K), zwycięzców = 1
+function pickTournament(population, k = 3, noReplace = false) {
+  const n = population.length;
+  if (n === 0) return null;
+  // ogranicz k do wielkości populacji
+  k = Math.max(1, Math.min(k, n));
   let best = null;
-  for (let i = 0; i < k; i++) {
-    const cand = population[Math.floor(Math.random() * population.length)];
-    if (!best || cand.fitness > best.fitness) best = cand;
+  if (noReplace && k > 1) {
+    // losowanie bez powtórzeń: wybierz k unikalnych indeksów (częściowy Fisher-Yates)
+    const idxs = [];
+    for (let i = 0; i < n; i++) idxs.push(i);
+    for (let i = 0; i < k; i++) {
+      const j = i + Math.floor(Math.random() * (n - i));
+      const tmp = idxs[i]; idxs[i] = idxs[j]; idxs[j] = tmp;
+      const cand = population[idxs[i]];
+      if (!best || cand.fitness > best.fitness) best = cand;
+    }
+  } else {
+    // losowanie z powtórzeniami (domyślnie) — zachowanie dotychczasowe
+    for (let i = 0; i < k; i++) {
+      const cand = population[Math.floor(Math.random() * n)];
+      if (!best || cand.fitness > best.fitness) best = cand;
+    }
   }
   return best;
 }
@@ -332,26 +373,26 @@ function evolve() {
     if (r < minRaw) minRaw = r;
     if (r > maxRaw) maxRaw = r;
   }
-  // >>> TU wstaw zabezpieczenie <<< 
+
+  // >>> TU wstaw zabezpieczenie <<<
+  // zadeklaruj totalFit wcześniej, aby uniknąć globalnego przecieku i mieć go dostępnego
+  let totalFit = 0;
+
   if (maxRaw === minRaw) {
-    // wszyscy mają ten sam wynik – ustaw fitness na 1
+    // wszyscy mają ten sam wynik – ustaw fitness na 1 (później policzymy totalFit po sharingu)
     for (const a of population) {
       a.fitness = 1.0;
     }
-    // możesz od razu policzyć totalFit
-    totalFit = population.length;
-    // i wyjść z funkcji, bo nie ma sensu normalizować
-    return;
-  }
-  // 2) Normalizacja fitness do [0..1]
-  const eps = 1e-8;
-  let totalFit = 0;
-  for (const a of population) {
-    const raw = (typeof a._rawFitness === 'number') ? a._rawFitness : a.fitness;
-    let norm = (raw - minRaw) / Math.max(eps, (maxRaw - minRaw));
-    norm = Math.pow(norm, 1.2);
-    a.fitness = Math.max(0.01, Math.min(1, norm)); // minimalny próg 0.01
-    totalFit += a.fitness;
+    // nie robimy early return — dalej wykona się sharing, histogram i selekcja
+  } else {
+    // 2) Normalizacja fitness do [0..1]
+    const eps = 1e-8;
+    for (const a of population) {
+      const raw = (typeof a._rawFitness === 'number') ? a._rawFitness : a.fitness;
+      let norm = (raw - minRaw) / Math.max(eps, (maxRaw - minRaw));
+      norm = Math.pow(norm, 1.2);
+      a.fitness = Math.max(0.01, Math.min(1, norm)); // minimalny próg 0.01
+    }
   }
 
   // >>> DODANE ze starej wersji: średni surowy fitness w procentach <<<
@@ -376,6 +417,13 @@ function evolve() {
     }
     if (denom > 0) a.fitness = a.fitness / denom;
   }
+
+  // --- WAŻNE: przelicz totalFit po sharingu, bo pickRoulette korzysta z sumy końcowych fitnessów
+  totalFit = population.reduce((s, a) => s + a.fitness, 0);
+
+  // aktualizuj widok totalFit (nie wpływa na logikę)
+  if (totalFitEl) totalFitEl.textContent = totalFit.toFixed(3);
+
   // 3b) Rysowanie histogramu fitnessów
   if (hctx) {
     const bins = 20;

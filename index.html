@@ -22,6 +22,7 @@
       </div>
       <span class="pill">Najlepszy fitness: <b id="best">0</b></span>
       <span class="pill">Średni fitness: <b id="avg">0</b></span>
+      <label>TotalFit: <span id="totalFit">0.000</span></label>
     </div>
 
     <label>Długość DNA (kroki)</label>
@@ -42,6 +43,11 @@
       <option value="tournament">Turniej (tournament)</option>
       <option value="rank">Ranking (rank)</option>
     </select>
+    <label style="margin-top:12px;">Rozmiar turnieju:
+      <input id="tournamentSize" type="range" min="2" max="20" value="5" />
+      <span id="tournamentSizeVal">5</span>
+    </label>
+    <label><input id="tournamentNoReplace" type="checkbox" /> bez powtórzeń</label>
     <div style="font-size:13px; color:#bbb; margin-top:6px;">
       <b>Wyjaśnienie metod:</b>
       <ul style="margin:6px 0 0 18px; color:#aaa;">
@@ -59,9 +65,7 @@
       <button id="restart">Restart</button>
       <button id="pause">Pauza</button>
     </div>
-
   </div>
-
   <canvas id="cv" width="320" height="320"></canvas>
 
   <div id="desc">
@@ -107,3 +111,5 @@
   </div>
   <script src="index.js"></script>
 </body>
+
+</html>
