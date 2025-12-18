@@ -20,22 +20,23 @@
       <div style="margin-top:12px;">
         <canvas id="hist" width="280" height="96"></canvas>
       </div>
-      <span class="pill">Najlepszy fitness: <b id="best">0</b></span>
-      <span class="pill">Średni fitness: <b id="avg">0</b></span>
-      <label>TotalFit: <span id="totalFit">0.000</span></label>
+      <span class="pill">Najlepszy: <b id="best">0</b></span>
+      <span class="pill">Średni: <b id="avg">0</b></span>
+      <span class="pill">Całkowity: <b id="totalFit">0.000</b></span>
     </div>
 
     <label>Długość DNA (kroki)</label>
-    <input id="dnaLen" type="range" min="50" max="800" value="300">
-    <div>Wartość: <b id="dnaLenVal">300</b></div>
+    <span>: <b id="dnaLenVal">300</b></span>
+    <input id="dnaLen" type="range" min="50" max="1000" value="400">
+
 
     <label>Mutacja (%)</label>
+    <span>: <b id="mutRateVal">5%</b></span>
     <input id="mutRate" type="range" min="0" max="20" value="5">
-    <div>Wartość: <b id="mutRateVal">5%</b></div>
 
     <label>Elitaryzm (ile najlepszych)</label>
-    <input id="elite" type="range" min="1" max="20" value="5">
-    <div>Wartość: <b id="eliteVal">5</b></div>
+    <span>: <b id="eliteVal">3</b></span>
+    <input id="elite" type="range" min="1" max="20" value="3">
 
     <label>Metoda selekcji</label>
     <select id="selMethod">
@@ -43,20 +44,10 @@
       <option value="tournament">Turniej (tournament)</option>
       <option value="rank">Ranking (rank)</option>
     </select>
-    <label style="margin-top:12px;">Rozmiar turnieju:
-      <input id="tournamentSize" type="range" min="2" max="20" value="5" />
-      <span id="tournamentSizeVal">5</span>
-    </label>
+    <label style="margin-top:12px;">Rozmiar turnieju </label>
+    <span>: <b id="tournamentSizeVal">5</b></span>
+    <input id="tournamentSize" type="range" min="2" max="20" value="5" />
     <label><input id="tournamentNoReplace" type="checkbox" /> bez powtórzeń</label>
-    <div style="font-size:13px; color:#bbb; margin-top:6px;">
-      <b>Wyjaśnienie metod:</b>
-      <ul style="margin:6px 0 0 18px; color:#aaa;">
-        <li><b>Ruletka</b> – prawdopodobieństwo proporcjonalne do fitnessu.</li>
-        <li><b>Turniej</b> – losujemy kilku osobników, wybieramy najlepszego (mniej wrażliwe na skrajne wartości).</li>
-        <li><b>Ranking</b> – sortujemy po fitness i wybieramy według rangi (redukuje wpływ wartości odstających).</li>
-      </ul>
-    </div>
-
     <label style="margin-top:12px;">
       <input type="checkbox" id="showTrails" checked> Pokaż trajektorie (ścieżki)
     </label>
@@ -66,9 +57,38 @@
       <button id="pause">Pauza</button>
     </div>
   </div>
-  <canvas id="cv" width="320" height="320"></canvas>
+  <canvas id="cv" width="200" height="200"></canvas>
 
   <div id="desc">
+    <h3>Jak to działa?</h3>
+    <p>
+      Mamy populację kropek. Każda kropka ma DNA — listę małych wektorów ruchu.
+      Symulujemy je jednocześnie; jeśli kropka uderzy w ścianę, umiera. Po wykonaniu wszystkich kroków
+      oceniamy, które były najbliżej celu (fitness). Najlepsze kopiujemy, mieszamy i losowo zmieniamy.
+      To proste odzwierciedlenie selekcji naturalnej: różnorodność + selekcja = lepsze rozwiązania.
+    </p>
+    <h3>Opis działania suwaków:</h3>
+    <ul>
+      <li><b>Długość DNA (kroki)</b> – liczba ruchów zapisanych w DNA każdej kropki. Większa wartość daje dłuższe
+        trajektorie, ale spowalnia uczenie.</li>
+      <li><b>Mutacja (%)</b> – procent losowych zmian w DNA potomków. Wyższa wartość zwiększa różnorodność, niższa
+        stabilizuje dobre rozwiązania.</li>
+      <li><b>Elitaryzm</b> – liczba najlepszych osobników, którzy przechodzą do kolejnej generacji bez zmian. Zwiększa
+        stabilność i zachowanie dobrych rozwiązań, ale zbyt duża wartość może ograniczyć różnorodność.</li>
+      <li><b>Rozmiar turnieju</b> – liczba osobników losowanych do pojedynczego turnieju. Im większy rozmiar, tym
+        większa
+        szansa, że wygra bardzo dobry osobnik, co przyspiesza konwergencję, ale może zmniejszyć różnorodność.</li>
+      <li><b>Bez powtórzeń</b> – jeśli zaznaczone, osobnik w danym turnieju nie może być wylosowany więcej niż raz.
+        Zwiększa to sprawiedliwość selekcji i zmniejsza ryzyko dominacji jednego osobnika w wielu próbach.</li>
+    </ul>
+    <div style="font-size:13px; color:#bbb; margin-top:6px;">
+      <b>Wyjaśnienie metod:</b>
+      <ul style="margin:6px 0 0 18px; color:#aaa;">
+        <li><b>Ruletka</b> – prawdopodobieństwo proporcjonalne do fitnessu.</li>
+        <li><b>Turniej</b> – losujemy kilku osobników, wybieramy najlepszego (mniej wrażliwe na skrajne wartości).</li>
+        <li><b>Ranking</b> – sortujemy po fitness i wybieramy według rangi (redukuje wpływ wartości odstających).</li>
+      </ul>
+    </div>
     <h3>Podstawy algorytmów genetycznych</h3>
     <p>
       Twórcą algorytmów genetycznych był <b>John Henry Holland</b> (1929–2015), profesor Uniwersytetu Michigan.
@@ -91,23 +111,6 @@
       modele inspirowane naturą mogą rozwiązywać problemy, których nie umiemy ugryźć
       klasycznymi metodami analitycznymi.
     </p>
-
-    <h3>Jak to działa?</h3>
-    <p>
-      Mamy populację kropek. Każda kropka ma DNA — listę małych wektorów ruchu.
-      Symulujemy je jednocześnie; jeśli kropka uderzy w ścianę, umiera. Po wykonaniu wszystkich kroków
-      oceniamy, które były najbliżej celu (fitness). Najlepsze kopiujemy, mieszamy i losowo zmieniamy.
-      To proste odzwierciedlenie selekcji naturalnej: różnorodność + selekcja = lepsze rozwiązania.
-    </p>
-    <h3>Opis działania suwaków:</h3>
-    <ul>
-      <li><b>Długość DNA (kroki)</b> – liczba ruchów zapisanych w DNA każdej kropki. Większa wartość daje dłuższe
-        trajektorie, ale spowalnia uczenie.</li>
-      <li><b>Mutacja (%)</b> – procent losowych zmian w DNA potomków. Wyższa wartość zwiększa różnorodność, niższa
-        stabilizuje dobre rozwiązania.</li>
-      <li><b>Elitaryzm</b> – liczba najlepszych osobników, którzy przechodzą do kolejnej generacji bez zmian. Zwiększa
-        stabilność i zachowanie dobrych rozwiązań, ale zbyt duża wartość może ograniczyć różnorodność.</li>
-    </ul>
   </div>
   <script src="index.js"></script>
 </body>

@@ -1,7 +1,7 @@
 // =========================
 // --- USTAWIENIA GLOBALNE
 // =========================
-const W = 320, H = 320; // nowy rozmiar canvasa
+const W = 200, H = 200; // nowy rozmiar canvasa
 const WALL_THICK = 5; // grubość ścian w px
 const POP_SIZE = 100;
 let DNA_LEN = 300;
