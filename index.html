@@ -56,7 +56,19 @@
       <button id="pause">Pauza</button>
     </div>
   </div>
-  <canvas id="cv" width="200" height="200"></canvas>
+  <div class="center">
+    <canvas id="cv" width="320" height="320"></canvas>
+    <b>Wyjaśnienie metod:</b>
+    <ul style="margin:6px 0 0 18px; color:#aaa;">
+      <li><b>Ruletka</b> – prawdopodobieństwo proporcjonalne do fitnessu. Jeśli ktoś ma 2x fitness,
+        ma 2x większą szansę zostać rodzicem. Proste, ale wrażliwe na outliery (bardzo dobrych).</li>
+      <li><b>Turniej</b> – losujemy kilku osobników i wybieramy najlepszego (mniej wrażliwe na skrajne wartości i
+        łatwe do zrównoleglenia).</li>
+      <li><b>Ranking</b> – sortujemy po fitness i wybieramy według rangi (np. liniowo). Redukuje
+        wpływ bardzo dużych różnic w fitnessie, co pomaga utrzymać różnorodność.
+      </li>
+    </ul>
+  </div>
 
   <div id="desc">
     <h3>Jak to działa?</h3>
@@ -71,50 +83,37 @@
       <li><b>Długość DNA (kroki)</b> – liczba ruchów zapisanych w DNA każdej kropki. Większa wartość daje dłuższe
         trajektorie, ale spowalnia uczenie.</li>
       <li><b>Mutacja (%)</b> – procent losowych zmian w DNA potomków. Wyższa wartość zwiększa różnorodność, niższa
-        stabilizuje dobre rozwiązania. Mutacja miesza DNA rodziców (tu jednopunktowe), wprowadza losowe zmiany, drobne przesunięcie kąta i prędkości.
-         To odpowiada rekombinacji i mutacjom w biologii.</li>
+        stabilizuje dobre rozwiązania. Mutacja miesza DNA rodziców (tu jednopunktowe), wprowadza losowe zmiany, drobne
+        przesunięcie kąta i prędkości.
+        To odpowiada rekombinacji i mutacjom w biologii.</li>
       <li><b>Elitaryzm</b> – liczba najlepszych osobników, którzy przechodzą do kolejnej generacji bez zmian. Zwiększa
         stabilność i zachowanie dobrych rozwiązań, ale zbyt duża wartość może ograniczyć różnorodność.</li>
       <li><b>Rozmiar turnieju</b> – liczba osobników losowanych do pojedynczego turnieju. Im większy rozmiar, tym
-        większa
-        szansa, że wygra bardzo dobry osobnik, co przyspiesza konwergencję, ale może zmniejszyć różnorodność.</li>
+        większa szansa, że wygra bardzo dobry osobnik, co przyspiesza konwergencję, ale może zmniejszyć różnorodność.
+      </li>
       <li><b>Bez powtórzeń</b> – jeśli zaznaczone, osobnik w danym turnieju nie może być wylosowany więcej niż raz.
         Zwiększa to sprawiedliwość selekcji i zmniejsza ryzyko dominacji jednego osobnika w wielu próbach.</li>
     </ul>
     <div style="font-size:13px; color:#bbb; margin-top:6px;">
-      <b>Wyjaśnienie metod:</b>
-      <ul style="margin:6px 0 0 18px; color:#aaa;">
-        <li><b>Ruletka</b> – prawdopodobieństwo proporcjonalne do fitnessu. Jeśli ktoś ma 2x fitness,
-          ma 2x większą szansę zostać rodzicem. Proste, ale wrażliwe na outliery (bardzo dobrych).</li>
-        <li><b>Turniej</b> – losujemy kilku osobników i wybieramy najlepszego (mniej wrażliwe na skrajne wartości i
-          łatwe do zrównoleglenia).</li>
-        <li><b>Ranking</b> – sortujemy po fitness i wybieramy według rangi (np. liniowo). Redukuje
-          wpływ bardzo dużych różnic w fitnessie, co pomaga utrzymać różnorodność.
-        </li>
-      </ul>
+
+      <h3>Podstawy algorytmów genetycznych</h3>
+      <p>
+        Twórcą algorytmów genetycznych był <b>John Henry Holland</b> (1929–2015), profesor Uniwersytetu Michigan.
+        Zainspirował się procesami biologicznej ewolucji – selekcją naturalną, dziedziczeniem cech i mutacjami –
+        oraz matematyką: teorią systemów złożonych, kombinatoryką i teorią informacji.
+        Chciał pokazać, że komputer może „uczyć się” poprzez symulację ewolucji,
+        bez konieczności pełnej wiedzy o strukturze problemu.
+      </p>
+      <p>
+        W praktyce oznacza to, że rozwiązania problemu traktujemy jak osobniki z DNA.
+        DNA to zapis parametrów lub instrukcji. Osobniki podlegają ocenie – mierzymy ich „fitness”,
+        czyli jak dobrze radzą sobie z zadaniem - matematyczna miara „przystosowania” rozwiązania do zadania. Najlepsi
+        mają większą szansę na reprodukcję.
+        Tworzymy nowe pokolenia poprzez krzyżowanie DNA i mutacje, co pozwala populacji
+        eksplorować przestrzeń rozwiązań.
+      </p>
     </div>
-    <h3>Podstawy algorytmów genetycznych</h3>
-    <p>
-      Twórcą algorytmów genetycznych był <b>John Henry Holland</b> (1929–2015), profesor Uniwersytetu Michigan.
-      Zainspirował się procesami biologicznej ewolucji – selekcją naturalną, dziedziczeniem cech i mutacjami –
-      oraz matematyką: teorią systemów złożonych, kombinatoryką i teorią informacji.
-      Chciał pokazać, że komputer może „uczyć się” poprzez symulację ewolucji,
-      bez konieczności pełnej wiedzy o strukturze problemu.
-    </p>
-    <p>
-      W praktyce oznacza to, że rozwiązania problemu traktujemy jak osobniki z DNA.
-      DNA to zapis parametrów lub instrukcji. Osobniki podlegają ocenie – mierzymy ich „fitness”,
-      czyli jak dobrze radzą sobie z zadaniem - matematyczna miara „przystosowania” rozwiązania do zadania. Najlepsi
-      mają większą szansę na reprodukcję.
-      Tworzymy nowe pokolenia poprzez krzyżowanie DNA i mutacje, co pozwala populacji
-      eksplorować przestrzeń rozwiązań.
-    </p>
-    <p>
-      Holland pokazał, że nawet proste reguły – ocena, selekcja, krzyżowanie, mutacja –
-      mogą prowadzić do złożonych i skutecznych rozwiązań. To przykład, jak matematyczne
-      modele inspirowane naturą mogą rozwiązywać problemy, których nie umiemy ugryźć
-      klasycznymi metodami analitycznymi.
-    </p>
+
   </div>
   <script src="index.js"></script>
 </body>

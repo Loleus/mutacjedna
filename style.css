@@ -7,6 +7,7 @@
  body {
    font-family: system-ui, sans-serif;
    background: #111;
+   background: linear-gradient(45deg, #0c0a1f, #1b375c 50%, #0c0a1f 100%);
    color: #eee;
    display: flex;
    flex-direction: row;
@@ -21,36 +22,50 @@
  #ui {
    width: 320px;
    max-height: calc(100vh - 48px);
-   /* odejmujemy padding body */
    overflow: auto;
-   background: #1a1a1a;
-   padding: 10px 20px;
-   border-radius:12px;
+   background: #191f26;
+   padding: 10px 20px 20px;
+   border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+   display: block;
  }
-
- canvas {
-   background: #222;
-   /* border: 1px solid #444; */
-   border-radius: 8px;
-   box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
- }
- #cv {
-  width: 400px;
-  margin: auto 0;
-  display: block;
- }
-
- #desc {
-   max-width: 33%;
+p {
+  text-indent: 18px;
+}
+ #desc,
+ .center {
+   max-width: 45%;
+   text-align: justify;
    max-height: calc(100vh - 48px);
    /* odejmujemy padding body */
    font-size: 14px;
    line-height: 1.5;
    color: #bbb;
    overflow-y: auto;
-   padding-right: 8px;
+   background: #191f26;
+   padding: 0 16px 16px;
+   border-radius: 12px;
+   box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
  }
+
+ .center {
+   max-width: 400px;
+   display: block;
+ }
+
+ canvas {
+   border-radius: 8px;
+   box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
+ }
+
+ .center #cv {
+   width: 320px;
+   margin: 16px auto;
+   display: block;
+   background: #191f26;
+  
+ }
+
 
  h2 {
    font-weight: 600;
@@ -82,7 +97,7 @@
 
  /* histogram rozkładu fitnessu */
  #hist {
-  padding: 0 5px;
+   padding: 0 5px;
    width: 100%;
    height: 96px;
    /* border: 1px solid #333; */
@@ -127,14 +142,16 @@
    color: #eee;
  }
 
- #desc h3 {
+ #desc h3,
+ .center h3 {
    margin-top: 10px;
    margin-bottom: 8px;
    color: #eee;
    font-size: 15px;
  }
 
- #desc ul {
+ #desc ul,
+ .center ul {
    margin-left: 18px;
    color: #aaa;
  }

@@ -1,7 +1,7 @@
 // =========================
 // --- USTAWIENIA GLOBALNE
 // =========================
-const W = 200, H = 200; // nowy rozmiar canvasa
+const W = 320, H = 320; // nowy rozmiar canvasa
 const WALL_THICK = 5; // grubość ścian w px
 const POP_SIZE = 100;
 let DNA_LEN = 300;
@@ -96,12 +96,12 @@ const walls = [
 
 function drawMaze() {
   // tło
-  ctx.fillStyle = '#222';
+  ctx.fillStyle = '#191f26';
   ctx.fillRect(0, 0, W, H);
 
   // cel
   ctx.beginPath();
-  ctx.fillStyle = '#2ecc71';
+  ctx.fillStyle = '#22cd00ff';
   ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI * 2);
   ctx.fill();
 
@@ -112,7 +112,7 @@ function drawMaze() {
   ctx.fill();
 
   // ściany
-  ctx.fillStyle = '#777';
+  ctx.fillStyle = '#7692a8ff';
   for (const w of walls) ctx.fillRect(w.x, w.y, w.w, w.h);
 }
 
@@ -226,12 +226,12 @@ class Agent {
 
   draw() {
     ctx.beginPath();
-    ctx.fillStyle = this.reached ? '#2ecc71' : (this.dead ? '#aa4444' : '#e0e0e0');
+    ctx.fillStyle = this.reached ? '#2ecc71' : (this.dead ? '#c54646ff' : '#e0e0e0');
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  drawStoredTrail(alpha = 0.9, color = '#ffd166', width = 2.5) {
+  drawStoredTrail(alpha = 1, color = '#ffd166', width = 2.5) {
     if (this.trailLen < 2) return;
     ctx.save(); ctx.globalAlpha = alpha; ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
     ctx.moveTo(this.trail[0], this.trail[1]);
@@ -560,11 +560,11 @@ function loop() {
 
       // dodatkowo rysujemy najlepszą trajektorię z poprzedniej generacji grubszą linią
       if (bestAgentEver && bestAgentEver.trailLen > 1) {
-        bestAgentEver.drawStoredTrail(0.9, '#ffd166', 2.5);
+        bestAgentEver.drawStoredTrail(0.9, '#128a00ff', 2.5);
       }
       // oraz uśrednioną trasę populacji (jeśli dostępna)
       if (avgAgentEver && avgAgentEver.trailLen > 1) {
-        avgAgentEver.drawStoredTrail(0.6, '#6ec1ff', 2.0);
+        avgAgentEver.drawStoredTrail(0.6, '#ffdb6eff', 2.0);
       }
 
       t++;
