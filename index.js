@@ -541,8 +541,6 @@ function evolve() {
   population = next;
 }
 
-
-
 // =========================
 // --- PĘTLA SYMULACJI I RYSOWANIA
 // =========================
@@ -589,33 +587,3 @@ function loop() {
   requestAnimationFrame(loop);
 }
 loop();
-
-// =========================
-// --- DODATKOWE KOMENTARZE "PO LUDZKU"
-// =========================
-/*
-  - Trajektorie (trail) przechowują kolejne pozycje agenta. Dzięki temu możemy narysować
-    ścieżkę, którą agent przebył. Rysujemy wszystkie trajektorie półprzezroczyste, a najlepszą
-    (najlepszy w historii) grubszą i wyróżnioną, żeby łatwiej zobaczyć "co działa".
-
-  - Metody selekcji:
-    * Ruletka (roulette): daje szansę proporcjonalną do fitnessu. Jeśli ktoś ma 2x fitness,
-      ma 2x większą szansę zostać rodzicem. Proste, ale wrażliwe na outliery (bardzo dobrych).
-    * Turniej (tournament): losujemy k osobników i wybieramy najlepszego. Mniej wrażliwe na
-      ekstremalne wartości i łatwe do zrównoleglenia.
-    * Ranga (rank): sortujemy po fitness i wybieramy według rangi (np. liniowo). Redukuje
-      wpływ bardzo dużych różnic w fitnessie, co pomaga utrzymać różnorodność.
-
-  - Elitaryzm: kopiujemy kilka najlepszych bez zmian, aby nie stracić dobrych rozwiązań przez
-    przypadkową mutację. To prosty sposób na stabilizację uczenia.
-
-  - Mutacja i krzyżowanie: krzyżowanie miesza DNA rodziców (tu jednopunktowe), mutacja
-    wprowadza losowe zmiany (tu drobne przesunięcie kąta i prędkości). To odpowiada
-    rekombinacji i mutacjom w biologii.
-
-  - John H. Holland: w latach 60. i 70. opisał koncepcję algorytmów genetycznych — ideę
-    używania mechanizmów podobnych do ewolucji (selekcja, krzyżowanie, mutacja) do
-    rozwiązywania problemów optymalizacyjnych. W praktyce algorytmy genetyczne są
-    heurystyką: nie gwarantują optymalnego rozwiązania, ale często znajdują dobre rozwiązania
-    w złożonych przestrzeniach poszukiwań.
-*/
