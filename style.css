@@ -5,7 +5,7 @@
  }
 
  body {
-   font-family: system-ui, sans-serif;
+   font-family: system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
    background: #111;
    background: linear-gradient(45deg, #0c0a1f, #1b375c 50%, #0c0a1f 100%);
    color: #eee;
@@ -49,7 +49,7 @@ p {
  }
 
  .center {
-   max-width: 400px;
+   max-width: 432px;
    display: block;
  }
 
@@ -59,7 +59,7 @@ p {
  }
 
  .center #cv {
-   width: 320px;
+   width: 400px;
    margin: 16px auto;
    display: block;
    background: #191f26;
