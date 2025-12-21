@@ -267,6 +267,7 @@ function resetPopulation(hard = false) {
   bestEl.textContent = bestFitness.toFixed(3);
   if (avgEl) avgEl.textContent = (0).toFixed(3);
 }
+
 resetPopulation();
 
 // --- Krzyżowanie (jednopunktowe) dla typowanych tablic [dx,dy, dx,dy, ...] ---
@@ -436,7 +437,7 @@ function evolve() {
     }
     const cw = histCanvas.width, ch = histCanvas.height;
     hctx.clearRect(0, 0, cw, ch);
-    hctx.fillStyle = '#111';
+    hctx.fillStyle = '#000e21ff';
     hctx.fillRect(0, 0, cw, ch);
     const maxC = Math.max(1, counts.reduce((m, c) => Math.max(m, c), 0));
     const barW = cw / bins;
@@ -444,7 +445,7 @@ function evolve() {
       const h = (counts[i] / maxC) * (ch - 40);
       const x = i * barW;
       const y = (ch - 20) - h;
-      hctx.fillStyle = '#ffd166';
+      hctx.fillStyle = '#0060df';
       hctx.fillRect(x + 1, y, Math.max(1, barW - 2), h);
     }
     hctx.fillStyle = '#fff';
@@ -586,4 +587,5 @@ function loop() {
 
   requestAnimationFrame(loop);
 }
+
 loop();

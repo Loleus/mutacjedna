@@ -78,17 +78,33 @@ p {
 
  .pill {
    background: #333;
-   padding: 6px 10px;
+   padding: 3px 10px 7px 10px;
    border-radius: 6px;
    display: inline-block;
-   margin-right: 8px;
+   margin-top: 8px;
    font-size: 13px;
    border: 1px solid black;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
+
 
  /* wyróżnienie wartości najlepszego fitnessu */
  .pill b#best {
-   color: #ffd166;
+   color: rgb(28, 207, 0);
+   font-weight: 700;
+   display: inline-block;
+   min-width: 30px;
+   text-align: right;
+ }
+ .pill b#avg {
+   color: #ffdb6eff;
+   font-weight: 700;
+   display: inline-block;
+   min-width: 30px;
+   text-align: right;
+ }
+ .pill b#totalFit {
+   color: #ccc;
    font-weight: 700;
    display: inline-block;
    min-width: 30px;
@@ -100,11 +116,13 @@ p {
    padding: 0 5px;
    width: 100%;
    height: 96px;
-   /* border: 1px solid #333; */
+   border: 1px solid #2f61d5;
    border-radius: 6px;
-   background: #111;
+   background: #000e21ff;
    display: block;
-   margin-bottom: 12px;
+   margin: 12px 0 5px;
+
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  label {
@@ -112,6 +130,7 @@ p {
    margin: 12px 0 6px;
    font-size: 14px;
    color: #ccc;
+   
  }
 
  input[type=range] {
@@ -127,6 +146,7 @@ p {
    cursor: pointer;
    margin-right: 8px;
    transition: background 0.2s;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  button:hover {
@@ -140,6 +160,7 @@ p {
    border: none;
    background: #333;
    color: #eee;
+      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  #desc h3,
