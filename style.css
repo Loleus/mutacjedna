@@ -35,12 +35,10 @@
    text-indent: 18px;
  }
 
- #desc,
- .center {
-   max-width: 44%;
+ #desc {
+   max-width: 45%;
    text-align: justify;
    max-height: calc(100vh - 48px);
-   /* odejmujemy padding body */
    font-size: 14px;
    line-height: 1.5;
    color: #bbb;
