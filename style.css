@@ -25,10 +25,19 @@
    max-height: calc(100vh - 48px);
    overflow: auto;
    background: #191f26;
-   padding: 8px 20px 20px;
+   padding: 5px 18px 18px;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-   display: block;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+ }
+
+ .params {
+   background: #182a3e;
+   padding: 5px 18px 18px;
+   border-radius: 12px;
+   box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
  }
 
  p {
@@ -42,7 +51,7 @@
    font-size: 14px;
    line-height: 1.5;
    color: #bbb;
-   overflow-y: auto;
+   overflow: auto;
    background: #191f26;
    padding: 0 16px 16px;
    border-radius: 12px;
@@ -53,6 +62,16 @@
    min-width: 432px;
    width: 432px;
    display: block;
+   text-align: justify;
+   max-height: calc(100vh - 48px);
+   font-size: 14px;
+   line-height: 1.5;
+   color: #bbb;
+   padding: 0 16px 16px;
+   overflow: auto;
+   border-radius: 12px;
+   box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+   background: #191f26;
  }
 
  canvas {
@@ -71,7 +90,7 @@
 
  h2 {
    font-weight: 600;
-   margin-bottom: 14px;
+   margin-bottom: 1px;
    text-align: center;
    text-shadow: 0px 0px 12px rgb(12, 133, 208);
    color: #d2e0ff
@@ -147,7 +166,7 @@
    border-radius: 6px;
    background: #000e21ff;
    display: block;
-   margin: 12px 0 0;
+   margin: 6px 0 0;
 
    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
