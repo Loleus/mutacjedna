@@ -29,12 +29,14 @@
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
    display: block;
  }
-p {
-  text-indent: 18px;
-}
+
+ p {
+   text-indent: 18px;
+ }
+
  #desc,
  .center {
-   max-width: 45%;
+   max-width: 44%;
    text-align: justify;
    max-height: calc(100vh - 48px);
    /* odejmujemy padding body */
@@ -63,13 +65,14 @@ p {
    margin: 16px auto;
    display: block;
    background: #191f26;
-  
+
  }
 
 
  h2 {
    font-weight: 600;
    margin-bottom: 10px;
+   text-align: center;
  }
 
  .stat {
@@ -81,12 +84,30 @@ p {
    padding: 3px 10px 7px 10px;
    border-radius: 6px;
    display: inline-block;
-   margin-top: 8px;
    font-size: 13px;
-   border: 1px solid black;
-      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
+   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
+ .global {
+   width: 100%;
+   display: flex;
+   justify-content: space-between;
+   margin: 0 auto;
+ }
+
+ .hist {
+   width: 100%;
+   display: flex;
+   justify-content: space-between;
+   margin-top:5px;
+ }
+
+ .hist .pill {
+   text-align: center;
+   width: 30%;
+   border: 1px solid #2f61d5;
+   background: #000e21ff;
+ }
 
  /* wyróżnienie wartości najlepszego fitnessu */
  .pill b#best {
@@ -94,21 +115,20 @@ p {
    font-weight: 700;
    display: inline-block;
    min-width: 30px;
-   text-align: right;
  }
+
  .pill b#avg {
    color: #ffdb6eff;
    font-weight: 700;
    display: inline-block;
    min-width: 30px;
-   text-align: right;
  }
+
  .pill b#totalFit {
    color: #ccc;
    font-weight: 700;
    display: inline-block;
    min-width: 30px;
-   text-align: right;
  }
 
  /* histogram rozkładu fitnessu */
@@ -120,9 +140,9 @@ p {
    border-radius: 6px;
    background: #000e21ff;
    display: block;
-   margin: 12px 0 5px;
+   margin: 12px 0 0;
 
-      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
+   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  label {
@@ -130,7 +150,7 @@ p {
    margin: 12px 0 6px;
    font-size: 14px;
    color: #ccc;
-   
+
  }
 
  input[type=range] {
@@ -146,7 +166,7 @@ p {
    cursor: pointer;
    margin-right: 8px;
    transition: background 0.2s;
-      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
+   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  button:hover {
@@ -160,7 +180,7 @@ p {
    border: none;
    background: #333;
    color: #eee;
-      box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
+   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  #desc h3,
