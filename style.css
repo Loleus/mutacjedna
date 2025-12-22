@@ -20,6 +20,7 @@
  }
 
  #ui {
+   min-width: 320px;
    width: 320px;
    max-height: calc(100vh - 48px);
    overflow: auto;
@@ -51,7 +52,8 @@
  }
 
  .center {
-   max-width: 432px;
+   min-width: 432px;
+   width: 432px;
    display: block;
  }
 
