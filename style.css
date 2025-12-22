@@ -83,7 +83,7 @@
 
  .pill {
    background: #333;
-   padding: 3px 10px 7px 10px;
+   padding: 3px 10px 5px 10px;
    border-radius: 6px;
    display: inline-block;
    font-size: 13px;
@@ -160,7 +160,7 @@
  }
 
  button {
-   padding: 8px 14px;
+   padding: 6px 14px 8px 14px;
    background: #444;
    color: #eee;
    border: none;
