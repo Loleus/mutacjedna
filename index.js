@@ -96,7 +96,7 @@ const walls = [
 
 function drawMaze() {
   // tło
-  ctx.fillStyle = '#191f26';
+  ctx.fillStyle = '#000e21ff';
   ctx.fillRect(0, 0, W, H);
 
   // cel

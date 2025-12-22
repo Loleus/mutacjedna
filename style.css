@@ -24,7 +24,7 @@
    width: 320px;
    max-height: calc(100vh - 48px);
    overflow: auto;
-   background: #191f26;
+   background: #0c1928;
    padding: 5px 18px 18px;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
@@ -34,10 +34,11 @@
  }
 
  .params {
-   background: #182a3e;
+   background: #000e21ff;
    padding: 5px 18px 18px;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+   border: 1px solid #2f61d5;
  }
 
  p {
@@ -52,7 +53,7 @@
    line-height: 1.5;
    color: #bbb;
    overflow: auto;
-   background: #191f26;
+   background: #0c1928;
    padding: 0 16px 16px;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
@@ -71,7 +72,7 @@
    overflow: auto;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-   background: #191f26;
+   background: #0c1928;
  }
 
  canvas {
@@ -83,8 +84,7 @@
    width: 400px;
    margin: 16px auto;
    display: block;
-   background: #191f26;
-
+     background: #0c1928;
  }
 
 
@@ -119,6 +119,7 @@
  .global .pill {
    background: #0f3609;
    border: 1px solid #1f7f10;
+   text-shadow: 2px 2px 2px rgb(0, 0, 0);
  }
 
  .hist {
@@ -198,8 +199,9 @@
    border-radius: 6px;
    cursor: pointer;
    transition: background 0.2s;
+   text-shadow: 2px 2px 2px rgb(0, 0, 0);
    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
-   background: #9a0101;
+   background: #7d0505;
    border: 1px solid #ff5858;
  }
 
@@ -212,7 +214,7 @@
    padding: 6px;
    border-radius: 6px;
    border: none;
-   background: #333;
+   background: #143b6e;
    color: #eee;
    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
