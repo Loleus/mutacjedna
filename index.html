@@ -29,19 +29,19 @@
 
     </div>
     <div class="params">
-      <label>Długość DNA (kroki)</label>
+      <label><b>Długość DNA</b> (kroki)</label>
       <span>: <b id="dnaLenVal">400</b></span>
       <input id="dnaLen" type="range" min="50" max="1000" value="400">
 
-      <label>Mutacja (%)</label>
-      <span>: <b id="mutRateVal">5%</b></span>
+      <label><b>Mutacja</b> (%)</label>
+      <span>: <b id="mutRateVal">5</b></span>
       <input id="mutRate" type="range" min="0" max="20" value="5">
 
-      <label>Elitaryzm (ile najlepszych)</label>
+      <label><b>Elitaryzm</b> (ile najlepszych)</label>
       <span>: <b id="eliteVal">3</b></span>
       <input id="elite" type="range" min="1" max="20" value="3">
 
-      <label>Metoda selekcji</label>
+      <label><b>Metoda selekcji</b></label>
 
       <select id="selMethod">
         <option value="roulette">Ruletka (roulette)</option>
@@ -49,7 +49,7 @@
         <option value="rank">Ranking (rank)</option>
       </select>
 
-      <label style="margin-top:12px;">Rozmiar turnieju </label>
+      <label style="margin-top:12px;"><b>Rozmiar turnieju</b> </label>
       <span>: <b id="tournamentSizeVal">5</b></span>
 
       <input id="tournamentSize" type="range" min="2" max="20" value="5" />
@@ -71,7 +71,7 @@
       <canvas id="cv" width="280" height="280"></canvas>
     </div>
     <div class="center">
-      <b>Wyjaśnienie metod:</b>
+      <h3><b>Metoda selekcji:</b></h3>
       <ul style="margin:6px 0 0 18px; color:#aaa;">
         <li><b>Ruletka</b> – prawdopodobieństwo proporcjonalne do fitnessu. Jeśli ktoś ma 2x fitness,
           ma 2x większą szansę zostać rodzicem. Proste, ale wrażliwe na outliery (bardzo dobrych).</li>
