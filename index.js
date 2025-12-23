@@ -112,7 +112,7 @@ function drawMaze() {
   ctx.fill();
 
   // ściany
-  ctx.fillStyle = '#7692a8ff';
+  ctx.fillStyle = '#0074cd';
   for (const w of walls) ctx.fillRect(w.x, w.y, w.w, w.h);
 }
 

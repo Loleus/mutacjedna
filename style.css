@@ -59,17 +59,23 @@
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
  }
 
+ .mid {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-around;
+   min-width: 430px;
+   width: 430px;
+   max-height: calc(100vh - 48px);
+ }
+
  .center {
-   min-width: 432px;
-   width: 432px;
+  margin:13px 0;
    display: block;
    text-align: justify;
-   max-height: calc(100vh - 48px);
    font-size: 14px;
    line-height: 1.5;
    color: #bbb;
-   padding: 0 16px 16px;
-   overflow: auto;
+   padding: 16px;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
    background: #0c1928;
@@ -82,9 +88,8 @@
 
  .center #cv {
    width: 400px;
-   margin: 16px auto;
    display: block;
-     background: #0c1928;
+   background: #0c1928;
  }
 
 
@@ -214,7 +219,7 @@
    padding: 6px;
    border-radius: 6px;
    border: none;
-   background: #143b6e;
+   background: #0f3609;
    color: #eee;
    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
