@@ -25,7 +25,7 @@
    max-height: calc(100vh - 48px);
    overflow: auto;
    background: #0c1928;
-   padding: 5px 18px 18px;
+   padding: 8px 18px 18px;
    border-radius: 12px;
    box-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
    display: flex;
@@ -95,7 +95,6 @@
 
  h2 {
    font-weight: 600;
-   margin-bottom: 6px;
    text-align: center;
    text-shadow: 0px 0px 12px rgb(12, 133, 208);
    color: #d2e0ff
@@ -106,24 +105,20 @@
  }
 
  .pill {
-   background: #333;
    padding: 3px 10px 5px 10px;
    border-radius: 6px;
    display: inline-block;
    font-size: 13px;
-   box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }
 
  .global {
    width: 100%;
    display: flex;
-   justify-content: space-between;
+   justify-content: space-around;
    margin: 0 auto;
  }
 
  .global .pill {
-   background: #0f3609;
-   border: 1px solid #1f7f10;
    text-shadow: 2px 2px 2px rgb(0, 0, 0);
  }
 
@@ -141,7 +136,6 @@
    background: #000e21ff;
  }
 
- /* wyróżnienie wartości najlepszego fitnessu */
  .pill b#best {
    color: rgb(28, 207, 0);
    font-weight: 700;
@@ -163,7 +157,6 @@
    min-width: 30px;
  }
 
- /* histogram rozkładu fitnessu */
  #hist {
    padding: 0 5px;
    width: 100%;
@@ -172,7 +165,7 @@
    border-radius: 6px;
    background: #000e21ff;
    display: block;
-   margin: 12px 0 0;
+   margin: 9px 0 0;
 
    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.6);
  }

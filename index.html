@@ -19,8 +19,8 @@
         <span class="pill">Generacja: <b id="gen">0</b></span>
       </div>
 
-
       <canvas id="hist" width="280" height="96"></canvas>
+
       <div class="hist">
         <span class="pill">Najlepszy<b id="best">0</b></span>
         <span class="pill">Średni<b id="avg">0</b></span>
@@ -28,36 +28,36 @@
       </div>
 
     </div>
-<div class="params">
-  <label>Długość DNA (kroki)</label>
-  <span>: <b id="dnaLenVal">400</b></span>
-  <input id="dnaLen" type="range" min="50" max="1000" value="400">
+    <div class="params">
+      <label>Długość DNA (kroki)</label>
+      <span>: <b id="dnaLenVal">400</b></span>
+      <input id="dnaLen" type="range" min="50" max="1000" value="400">
 
-  <label>Mutacja (%)</label>
-  <span>: <b id="mutRateVal">5%</b></span>
-  <input id="mutRate" type="range" min="0" max="20" value="5">
+      <label>Mutacja (%)</label>
+      <span>: <b id="mutRateVal">5%</b></span>
+      <input id="mutRate" type="range" min="0" max="20" value="5">
 
-  <label>Elitaryzm (ile najlepszych)</label>
-  <span>: <b id="eliteVal">3</b></span>
-  <input id="elite" type="range" min="1" max="20" value="3">
+      <label>Elitaryzm (ile najlepszych)</label>
+      <span>: <b id="eliteVal">3</b></span>
+      <input id="elite" type="range" min="1" max="20" value="3">
 
-  <label>Metoda selekcji</label>
+      <label>Metoda selekcji</label>
 
-  <select id="selMethod">
-    <option value="roulette">Ruletka (roulette)</option>
-    <option value="tournament">Turniej (tournament)</option>
-    <option value="rank">Ranking (rank)</option>
-  </select>
+      <select id="selMethod">
+        <option value="roulette">Ruletka (roulette)</option>
+        <option value="tournament">Turniej (tournament)</option>
+        <option value="rank">Ranking (rank)</option>
+      </select>
 
-  <label style="margin-top:12px;">Rozmiar turnieju </label>
-  <span>: <b id="tournamentSizeVal">5</b></span>
+      <label style="margin-top:12px;">Rozmiar turnieju </label>
+      <span>: <b id="tournamentSizeVal">5</b></span>
 
-  <input id="tournamentSize" type="range" min="2" max="20" value="5" />
-  <label><input id="tournamentNoReplace" type="checkbox" /> bez powtórzeń</label>
+      <input id="tournamentSize" type="range" min="2" max="20" value="5" />
+      <label><input id="tournamentNoReplace" type="checkbox" /> bez powtórzeń</label>
 
-  <label style="margin-top:12px;">
-    <input type="checkbox" id="showTrails" checked> Pokaż trajektorie (ścieżki)</label>
-</div>
+      <label style="margin-top:12px;">
+        <input type="checkbox" id="showTrails" checked> Pokaż trajektorie (ścieżki)</label>
+    </div>
 
     <div class="buttons">
       <button id="restart">Restart</button>
@@ -66,7 +66,7 @@
 
   </div>
   <div class="mid">
-    
+
     <div class="center">
       <canvas id="cv" width="280" height="280"></canvas>
     </div>
