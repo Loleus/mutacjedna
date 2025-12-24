@@ -69,7 +69,7 @@ if (tournamentNoReplaceEl) {
 
 // Obsługa UI
 dnaLenEl.oninput = () => { DNA_LEN = +dnaLenEl.value; dnaLenValEl.textContent = DNA_LEN; resetPopulation(); };
-mutRateEl.oninput = () => { MUT_RATE = +mutRateEl.value / 100; mutRateValEl.textContent = Math.round(MUT_RATE * 100) + '%'; };
+mutRateEl.oninput = () => { MUT_RATE = +mutRateEl.value / 100; mutRateValEl.textContent = Math.round(MUT_RATE * 100); };
 eliteEl.oninput = () => { ELITE_COUNT = +eliteEl.value; eliteValEl.textContent = ELITE_COUNT; };
 btnRestart.onclick = () => resetPopulation(true);
 let paused = false;
@@ -96,7 +96,7 @@ const walls = [
 
 function drawMaze() {
   // tło
-  ctx.fillStyle = '#000e21ff';
+  ctx.fillStyle = '#0b192b';
   ctx.fillRect(0, 0, W, H);
 
   // cel
@@ -437,7 +437,7 @@ function evolve() {
     }
     const cw = histCanvas.width, ch = histCanvas.height;
     hctx.clearRect(0, 0, cw, ch);
-    hctx.fillStyle = '#000e21ff';
+    hctx.fillStyle = '#0b192b';
     hctx.fillRect(0, 0, cw, ch);
     const maxC = Math.max(1, counts.reduce((m, c) => Math.max(m, c), 0));
     const barW = cw / bins;
