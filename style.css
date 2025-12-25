@@ -16,9 +16,9 @@
   --color-shadow: rgba(0, 0, 0, 0.6);
 
   /* --- Shadows --- */
-  --shadow-strong: 0 0 16px var(--color-shadow);
   --shadow-medium: 0 0 12px var(--color-shadow);
-  --shadow-soft: 1px 1px 5px var(--color-shadow);
+  --shadow-soft: 1px 1px 3px var(--color-shadow);
+  --shadow-blue: 0 0 12px rgb(12, 133, 208);
 
   /* --- Layout --- */
   --radius: 12px;
@@ -43,37 +43,37 @@
    BODY
    ========================================================= */
 body {
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  flex-direction: row;
+  gap: 22px;
+  padding: 24px;
+  justify-content: center;
+  align-items: flex-start;
   font-family: var(--font-main);
+  color: var(--color-text-main);
   background: var(--color-bg-panel);
   background: linear-gradient(45deg,
       var(--color-bg-gradient-1),
       var(--color-bg-gradient-2) 50%,
       var(--color-bg-gradient-1) 100%);
-  color: var(--color-text-main);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  overflow: auto;
-  gap: 22px;
-  padding: 24px;
 }
 
 /* =========================================================
    LEFT PANEL (UI)
    ========================================================= */
 #ui {
-  min-width: 320px;
-  width: 320px;
-  max-height: calc(100vh - 48px);
-  overflow: auto;
-  padding: 8px var(--padding-panel) var(--padding-panel);
-  border-radius: var(--radius);
   display: flex;
+  overflow: auto;
+  width: 320px;
+  min-width: 320px;
+  max-height: calc(100vh - 48px);
   flex-direction: column;
+  padding: 8px var(--padding-panel) var(--padding-panel);
   justify-content: space-between;
   border: 1px solid var(--color-border);
+  border-radius: var(--radius);
 }
 
 /* =========================================================
@@ -96,9 +96,9 @@ p {
 
 h2 {
   font-weight: 800;
-  font-size: var(--font-size-title);
   text-align: center;
-  text-shadow: 0 0 12px rgb(12, 133, 208);
+  font-size: var(--font-size-title);
+  text-shadow: var(--shadow-blue);
   color: var(--color-text-main);
 }
 
@@ -114,6 +114,7 @@ label {
    ========================================================= */
 #desc {
   max-width: 660px;
+  min-width: 320px;
   text-align: justify;
   max-height: calc(100vh - 48px);
   font-size: var(--font-size-base);
@@ -131,7 +132,7 @@ label {
   margin-bottom: 8px;
   color: var(--color-text-main);
   font-size: 15px;
-  text-shadow: 0 0 12px rgb(12, 133, 208);
+  text-shadow: var(--shadow-blue);
 }
 
 #desc ul,
@@ -171,7 +172,7 @@ label {
    CANVAS
    ========================================================= */
 canvas {
-  box-shadow: var(--shadow-strong);
+  box-shadow: var(--shadow-medium);
   background: var(--color-bg-panel);
   display: block;
   width: 100%;
@@ -188,11 +189,11 @@ canvas {
    HISTOGRAM CANVAS
    ========================================================= */
 #hist {
-  padding: 0 5px;
   height: 96px;
+  margin-top: 16px;
+  padding: 0 5px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  margin-top: 16px;
 }
 
 /* =========================================================
@@ -203,9 +204,9 @@ canvas {
 }
 
 .pill {
+  display: inline-block;
   padding: 3px 10px 0px;
   border-radius: var(--radius);
-  display: inline-block;
   font-size: var(--font-size-base);
 }
 
@@ -228,32 +229,27 @@ canvas {
 }
 
 .hist .pill {
-  text-align: center;
   width: 32%;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-panel);
   padding: 3px 10px 6px;
+  border: 1px solid var(--color-border);
+  text-align: center;
+  background: var(--color-bg-panel);
 }
-
-.pill b#best {
+.pill b {
+  min-width: 30px;
+  display: inline-block;
+  font-weight: 700;
+}
+.pill #best {
   color: var(--color-text-green);
-  font-weight: 700;
-  min-width: 30px;
-  display: inline-block;
 }
 
-.pill b#avg {
+.pill #avg {
   color: var(--color-text-yellow);
-  font-weight: 700;
-  min-width: 30px;
-  display: inline-block;
 }
 
-.pill b#totalFit {
+.pill #totalFit {
   color: var(--color-text-gray);
-  font-weight: 700;
-  min-width: 30px;
-  display: inline-block;
 }
 
 /* =========================================================
@@ -288,11 +284,11 @@ button:hover {
 select {
   width: 100%;
   padding: 6px;
-  border-radius: var(--radius);
   border: none;
-  background: #193256;
+  border-radius: var(--radius);
   color: var(--color-text-main);
   box-shadow: var(--shadow-soft);
+  background: var(--color-bg-gradient-2);
 }
 
 /* =========================================================
