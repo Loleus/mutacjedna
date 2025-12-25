@@ -49,13 +49,13 @@
         <option value="rank">Ranking (rank)</option>
       </select>
 
-      <label style="margin-top:12px;"><b>Rozmiar turnieju</b> </label>
+      <label><b>Rozmiar turnieju</b> </label>
       <span>: <b id="tournamentSizeVal">5</b></span>
 
       <input id="tournamentSize" type="range" min="2" max="20" value="5" />
       <label><input id="tournamentNoReplace" type="checkbox" /> bez powtórzeń</label>
 
-      <label style="margin-top:12px;">
+      <label>
         <input type="checkbox" id="showTrails" checked> Pokaż trajektorie (ścieżki)</label>
     </div>
 
@@ -71,7 +71,7 @@
     </div>
     <div class="center">
       <h3>Metoda selekcji:</h3>
-      <ul style="margin:6px 0 0 18px; color:#aaa;">
+      <ul>
         <li><b>Ruletka</b> – prawdopodobieństwo proporcjonalne do fitnessu. Jeśli ktoś ma 2x fitness,
           ma 2x większą szansę zostać rodzicem. Proste, ale wrażliwe na outliery (bardzo dobrych).</li>
         <li><b>Turniej</b> – losujemy kilku osobników i wybieramy najlepszego (mniej wrażliwe na skrajne wartości i
@@ -107,7 +107,7 @@
       <li><b>Bez powtórzeń</b> – jeśli zaznaczone, osobnik w danym turnieju nie może być wylosowany więcej niż raz.
         Zwiększa to sprawiedliwość selekcji i zmniejsza ryzyko dominacji jednego osobnika w wielu próbach.</li>
     </ul>
-    <div style="font-size:13px; color:#bbb; margin-top:6px;">
+    <div class="history">
 
       <h3>Podstawy algorytmów genetycznych</h3>
       <p>

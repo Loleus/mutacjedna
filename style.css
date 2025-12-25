@@ -4,10 +4,10 @@
   --color-bg-gradient-2: #1b375c;
   --color-text-main: #eee;
   --color-text-green: #1ccf00;
-  --color-text-yellow: #ffdb6e;
-  --color-text-gray: #bbb;
+  --color-text-yellow: #ecd53f;
+  --color-text-gray: #d0d0d0;
   --color-border: #2f61d5;
-  --color-button: #961c03;
+  --color-button: #b90000;
   --color-button-hover: #ff5858;
   --color-shadow: rgba(0, 0, 0, 0.6);
   
@@ -17,7 +17,7 @@
   --shadow-blue: 0 0 var(--shadow-big-blur) var(--color-border);
 
   --radius: 10px;
-  --padding-panel: 18px;
+  --padding-panel: 10px;
 
   --font-main: system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   --font-size-base: 14px;
@@ -113,6 +113,10 @@ label {
 #desc ul, .center ul {
   margin-left: 18px;
   color: var(--color-text-gray);
+}
+
+.history {
+  font-size: 13px;
 }
 
 .mid {
