@@ -1,10 +1,6 @@
-/* =========================================================
-   ROOT VARIABLES
-   ========================================================= */
 :root {
-  /* --- Colors --- */
   --color-bg-panel: #0b192b;
-  --color-bg-gradient-1: #0a0d2d;
+  --color-bg-gradient-1: #0b0a2d;
   --color-bg-gradient-2: #1b375c;
   --color-text-main: #eee;
   --color-text-green: #1ccf00;
@@ -14,43 +10,35 @@
   --color-button: #961c03;
   --color-button-hover: #ff5858;
   --color-shadow: rgba(0, 0, 0, 0.6);
+  
+  --shadow-big-blur: 12px;
+  --shadow-medium: 0 0 var(--shadow-big-blur) var(--color-shadow);
+  --shadow-soft: 1px 1px 2px var(--color-shadow);
+  --shadow-blue: 0 0 var(--shadow-big-blur) var(--color-border);
 
-  /* --- Shadows --- */
-  --shadow-medium: 0 0 12px var(--color-shadow);
-  --shadow-soft: 1px 1px 3px var(--color-shadow);
-  --shadow-blue: 0 0 12px rgb(12, 133, 208);
-
-  /* --- Layout --- */
-  --radius: 12px;
+  --radius: 10px;
   --padding-panel: 18px;
 
-  /* --- Typography --- */
   --font-main: system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   --font-size-base: 14px;
   --font-size-title: 1.7em;
 }
 
-/* =========================================================
-   GLOBAL RESET
-   ========================================================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* =========================================================
-   BODY
-   ========================================================= */
 body {
   display: flex;
   overflow: auto;
   min-height: 100vh;
   flex-direction: row;
-  gap: 22px;
-  padding: 24px;
   justify-content: center;
   align-items: flex-start;
+  gap: 22px;
+  padding: 24px;
   font-family: var(--font-main);
   color: var(--color-text-main);
   background: var(--color-bg-panel);
@@ -60,25 +48,19 @@ body {
       var(--color-bg-gradient-1) 100%);
 }
 
-/* =========================================================
-   LEFT PANEL (UI)
-   ========================================================= */
 #ui {
   display: flex;
   overflow: auto;
-  width: 320px;
-  min-width: 320px;
   max-height: calc(100vh - 48px);
+  min-width: 320px;
+  width: 320px;
   flex-direction: column;
-  padding: 8px var(--padding-panel) var(--padding-panel);
   justify-content: space-between;
+  padding: 8px var(--padding-panel) var(--padding-panel);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
 }
 
-/* =========================================================
-   PARAMS PANEL
-   ========================================================= */
 .params {
   background: var(--color-bg-panel);
   padding: 5px var(--padding-panel) var(--padding-panel);
@@ -87,9 +69,6 @@ body {
   border: 1px solid var(--color-border);
 }
 
-/* =========================================================
-   TEXT ELEMENTS
-   ========================================================= */
 p {
   text-indent: 18px;
 }
@@ -109,96 +88,75 @@ label {
   color: var(--color-text-gray);
 }
 
-/* =========================================================
-   DESCRIPTION PANEL
-   ========================================================= */
 #desc {
+  overflow: auto;
+  max-height: calc(100vh - 48px);
   max-width: 660px;
   min-width: 320px;
   text-align: justify;
-  max-height: calc(100vh - 48px);
-  font-size: var(--font-size-base);
   line-height: 1.5;
+  font-size: var(--font-size-base);
   color: var(--color-text-gray);
-  overflow: auto;
   padding: 0 16px 16px;
   border-radius: var(--radius);
   border: 1px solid var(--color-border);
 }
 
-#desc h3,
-.center h3 {
+#desc h3, .center h3 {
   margin-top: 10px;
   margin-bottom: 8px;
-  color: var(--color-text-main);
   font-size: 15px;
+  color: var(--color-text-main);
   text-shadow: var(--shadow-blue);
 }
 
-#desc ul,
-.center ul {
+#desc ul, .center ul {
   margin-left: 18px;
   color: var(--color-text-gray);
 }
 
-/* =========================================================
-   MIDDLE COLUMN
-   ========================================================= */
 .mid {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  max-height: calc(100vh - 48px);
   min-width: 320px;
   width: 320px;
-  max-height: calc(100vh - 48px);
+  flex-direction: column;
+  justify-content: flex-start;
   gap: 16px;
   border-radius: var(--radius);
 }
 
 .center {
   display: block;
-  text-align: justify;
-  font-size: var(--font-size-base);
-  line-height: 1.5;
-  color: var(--color-text-gray);
-  padding: 0 16px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--color-border);
   overflow-y: auto;
   overflow-x: hidden;
+  padding: 0 16px 16px;
+  text-align: justify;
+  line-height: 1.5;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-base);
+  color: var(--color-text-gray);
 }
 
-/* =========================================================
-   CANVAS
-   ========================================================= */
 canvas {
-  box-shadow: var(--shadow-medium);
-  background: var(--color-bg-panel);
   display: block;
   width: 100%;
-}
-
-/* =========================================================
-   LABIRYNT CANVAS
-   ========================================================= */
-#cv {
   margin-top: 16px;
+  box-shadow: var(--shadow-medium);
+  background: var(--color-bg-panel);
 }
 
-/* =========================================================
-   HISTOGRAM CANVAS
-   ========================================================= */
+#cv {
+}
+
 #hist {
   height: 96px;
-  margin-top: 16px;
   padding: 0 5px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
 }
 
-/* =========================================================
-   STATS + PILLS
-   ========================================================= */
 .stat {
   margin: 8px 0 6px;
 }
@@ -210,36 +168,38 @@ canvas {
   font-size: var(--font-size-base);
 }
 
-.global {
-  width: 100%;
+.global, .hist, .buttons {
   display: flex;
+  width: 100%;
   justify-content: space-around;
+}
+
+.global {
   margin: 0 auto;
 }
 
 .global .pill {
-  text-shadow: 2px 2px 2px rgb(0, 0, 0);
+  text-shadow: var(--shadow-soft);
 }
 
 .hist {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
   margin-top: 6px;
 }
 
 .hist .pill {
   width: 32%;
   padding: 3px 10px 6px;
-  border: 1px solid var(--color-border);
   text-align: center;
+  border: 1px solid var(--color-border);
   background: var(--color-bg-panel);
 }
+
 .pill b {
-  min-width: 30px;
   display: inline-block;
+  min-width: 30px;
   font-weight: 700;
 }
+
 .pill #best {
   color: var(--color-text-green);
 }
@@ -252,24 +212,18 @@ canvas {
   color: var(--color-text-gray);
 }
 
-/* =========================================================
-   BUTTONS
-   ========================================================= */
 .buttons {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
   margin-top: 16px;
 }
 
 button {
   padding: 5px 18px 8px;
-  color: var(--color-text-main);
   border: none;
-  border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.2s;
-  text-shadow: 2px 2px 2px rgb(0, 0, 0);
+  text-shadow: var(--shadow-soft);
+  color: var(--color-text-main);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
   background: var(--color-button);
 }
@@ -278,9 +232,6 @@ button:hover {
   background: var(--color-button-hover);
 }
 
-/* =========================================================
-   SELECT
-   ========================================================= */
 select {
   width: 100%;
   padding: 6px;
@@ -291,9 +242,6 @@ select {
   background: var(--color-bg-gradient-2);
 }
 
-/* =========================================================
-   RANGE INPUT
-   ========================================================= */
 input[type=range] {
   width: 100%;
 }
