@@ -37,7 +37,9 @@ body {
   font-family: "Noto Sans", system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   font-size: 14px;
   color: var(--color-text-main);
-  background-image: linear-gradient(45deg, var(--color-bg-gradient-1), var(--color-bg-gradient-2) 50%, var(--color-bg-gradient-1) 100%);
+  background-image: linear-gradient(45deg, var(--color-bg-gradient-1), var(--color-bg-gradient-2) 50%, var(--color-bg-gradient-1) 100%),
+  url('./bdg.jpg');
+  background-blend-mode: multiply;
   background-size: cover;
 }
 #ui, .mid, #desc {
