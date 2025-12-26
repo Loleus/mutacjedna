@@ -52,7 +52,6 @@ body {
   line-height: 1.5;
   max-height: calc(100vh - 28px);
   border-radius: var(--radius);
-  border: 1px solid var(--color-border);
   padding: 14px;
 }
 #ui {
