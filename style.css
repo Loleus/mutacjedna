@@ -21,10 +21,7 @@
   margin: 0;
   padding: 0;
 }
-/* html {
-  height: 100%;
-  width: 100%;
-} */
+
 body {
   display: flex;
   overflow: auto;
@@ -193,8 +190,8 @@ select {
 input[type=range] {
   width: 100%;
 }
-@media screen and (max-width: 1023px) and (orientation: landscape) {
 
+@media screen and (max-width: 1023px) and (orientation: landscape) {
   body {
     flex-direction: column;
     align-items: center;
@@ -203,7 +200,7 @@ input[type=range] {
     height: 100%;
   }
   #ui, .mid, #desc {
-    max-width: 320px;
+    min-width: 320px;
     line-height: 1.2;
     min-height: 100%;
       max-height: 100%;
@@ -214,5 +211,4 @@ input[type=range] {
   .center {
     overflow: visible;
   }
-
 }
