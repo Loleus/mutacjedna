@@ -426,36 +426,52 @@ function evolve() {
   if (totalFitEl) totalFitEl.textContent = totalFit.toFixed(3);
 
   // 3b) Rysowanie histogramu fitnessów
-  if (hctx) {
-    const bins = 20;
-    const counts = new Array(bins).fill(0);
-    for (const a of population) {
-      const v = Math.max(0, Math.min(1, a.fitness));
-      let idx = Math.floor(v * bins);
-      if (idx >= bins) idx = bins - 1;
-      counts[idx]++;
-    }
-    const cw = histCanvas.width, ch = histCanvas.height;
-    hctx.clearRect(0, 0, cw, ch);
-    hctx.fillStyle = '#0b192b';
-    hctx.fillRect(0, 0, cw, ch);
-    const maxC = Math.max(1, counts.reduce((m, c) => Math.max(m, c), 0));
-    const barW = cw / bins;
-    for (let i = 0; i < bins; i++) {
-      const h = (counts[i] / maxC) * (ch - 40);
-      const x = i * barW;
-      const y = (ch - 20) - h;
-      hctx.fillStyle = '#0060df';
-      hctx.fillRect(x + 1, y, Math.max(1, barW - 2), h);
-    }
-    hctx.fillStyle = '#fff';
-    hctx.font = '12px sans-serif';
-    hctx.textAlign = 'center';
-    hctx.fillText('Fitness histogram', cw / 2, 14);
-    hctx.fillText('0', barW * 0.4, ch - 8);
-    hctx.fillText('50', cw / 2, ch - 8);
-    hctx.fillText('100', cw - barW * 1.0, ch - 8);
+
+if (hctx) {
+  const bins = 20;
+  const counts = new Array(bins).fill(0);
+
+  for (const a of population) {
+    const v = Math.max(0, Math.min(1, a.fitness));
+    let idx = Math.floor(v * bins);
+    if (idx >= bins) idx = bins - 1;
+    counts[idx]++;
   }
+
+  const cw = histCanvas.width, ch = histCanvas.height;
+  hctx.clearRect(0, 0, cw, ch);
+
+  // tło
+  hctx.fillStyle = '#0b192b';
+  hctx.fillRect(0, 0, cw, ch);
+
+  const maxC = Math.max(1, counts.reduce((m, c) => Math.max(m, c), 0));
+  const barW = cw / bins;
+
+  // gradient dla całego histogramu (od góry do dołu)
+  const gradient = hctx.createLinearGradient(0, 20, 0, ch - 20);
+  gradient.addColorStop(0, '#22cd00ff'); // zielony u góry
+  gradient.addColorStop(1, '#0060df');   // niebieski u dołu
+
+  // słupki
+  for (let i = 0; i < bins; i++) {
+    const h = (counts[i] / maxC) * (ch - 40);
+    const x = i * barW;
+    const y = (ch - 20) - h;
+
+    hctx.fillStyle = gradient;
+    hctx.fillRect(x + 1, y, Math.max(1, barW - 2), h);
+  }
+
+  // podpisy
+  hctx.fillStyle = '#fff';
+  hctx.font = '12px sans-serif';
+  hctx.textAlign = 'center';
+  hctx.fillText('Fitness histogram', cw / 2, 14);
+  hctx.fillText('0', barW * 0.4, ch - 8);
+  hctx.fillText('50', cw / 2, ch - 8);
+  hctx.fillText('100', cw - barW * 1.0, ch - 8);
+}
 
   // 4) Statystyki i najlepszy agent
   const best = population.reduce((acc, a) => (!acc || a.fitness > acc.fitness) ? a : acc, null);
@@ -467,10 +483,7 @@ function evolve() {
   // 5) Sortowanie populacji
   const sorted = [...population].sort((a, b) => b.fitness - a.fitness);
   // --- aktualizacja najlepszego agenta w historii ---
-  if (!bestAgentEver ||
-    (typeof best._rawFitness === 'number' && typeof bestAgentEver._rawFitness === 'number'
-      ? best._rawFitness > bestAgentEver._rawFitness
-      : best.fitness > bestAgentEver.fitness)) {
+  if (!bestAgentEver || (typeof best._rawFitness === 'number' && typeof bestAgentEver._rawFitness === 'number' ? best._rawFitness > bestAgentEver._rawFitness : best.fitness > bestAgentEver.fitness)) {
     bestAgentEver = new Agent(new Float32Array(best.dna));
     bestAgentEver.trail = best.trail.slice();
     bestAgentEver.trailLen = best.trailLen || 0;
