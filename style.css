@@ -191,7 +191,7 @@ input[type=range] {
   width: 100%;
 }
 
-@media screen and (max-width: 1023px) and (orientation: landscape) {
+@media screen and (max-width: 1023px) {
   body {
     flex-direction: column;
     align-items: center;
@@ -200,10 +200,12 @@ input[type=range] {
     height: 100%;
   }
   #ui, .mid, #desc {
-    min-width: 320px;
     line-height: 1.2;
+    max-width:512px;
     min-height: 100%;
-      max-height: 100%;
+    width:auto;
+    min-width: 320px;
+    max-height: 100%;
   }
   .history p {
   font-size: 10px;
