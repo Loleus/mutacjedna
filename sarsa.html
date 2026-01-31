@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>SARSA: 100 kropek w labiryncie</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#111; color:#eee; display:flex; gap:24px; }
+    #ui { width: 320px; }
+    canvas { background:#222; border:1px solid #444; }
+    .pill { background:#333; padding:6px 10px; border-radius:6px; display:inline-block; margin-right:8px; }
+    label { display:block; margin:8px 0 4px; font-size:14px; color:#ccc; }
+    input[type=range] { width:100%; }
+    button { padding:8px 12px; background:#444; color:#eee; border:none; cursor:pointer; }
+    button:hover { background:#555; }
+    .hint { color:#aaa; font-size:13px; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <h2>SARSA w labiryncie</h2>
+    <div><span class="pill">Populacja: <b id="pop">100</b></span><span class="pill">Epizod: <b id="epi">0</b></span></div>
+    <div><span class="pill">Epsilon: <b id="eps">0.30</b></span><span class="pill">Najlepszy czas: <b id="best">—</b></span></div>
+
+    <label>Rozmiar komórki siatki (px)</label>
+    <input id="cellSize" type="range" min="10" max="40" value="20">
+    <div>Wartość: <b id="cellSizeVal">20</b></div>
+
+    <label>Uczenie (alpha)</label>
+    <input id="alpha" type="range" min="1" max="100" value="25">
+    <div>Wartość: <b id="alphaVal">0.25</b></div>
+
+    <label>Zdyskontowanie (gamma)</label>
+    <input id="gamma" type="range" min="50" max="99" value="92">
+    <div>Wartość: <b id="gammaVal">0.92</b></div>
+
+    <label>Epsilon początkowy</label>
+    <input id="epsInit" type="range" min="0" max="100" value="30">
+    <div>Wartość: <b id="epsInitVal">0.30</b></div>
+
+    <label>Spadek eps po epizodzie</label>
+    <input id="epsDecay" type="range" min="90" max="100" value="98">
+    <div>Wartość: <b id="epsDecayVal">0.98</b> <span class="hint">(mnożnik)</span></div>
+
+    <div style="margin-top:12px;">
+      <button id="restart">Restart</button>
+      <button id="pause">Pauza</button>
+      <button id="clearQ">Wyczyść Q</button>
+    </div>
+
+    <p class="hint" style="margin-top:12px;">
+      SARSA: Q[s,a] ← Q[s,a] + α [ r + γ Q[s’,a’] − Q[s,a] ]  
+      czyli aktualizacja na podstawie faktycznie wybranej akcji w następnym stanie.
+    </p>
+  </div>
+
+  <canvas id="cv" width="720" height="520"></canvas>
+
+  <script>
+    // --- Parametry ---
+    const W = 720, H = 520;
+    const POP_SIZE = 100;
+    const SPEED = 2.0;
+    const STEP_LIMIT = 2000;
+
+    const start = { x: 50, y: H - 50 };
+    const goal  = { x: W - 70, y: 60, r: 18 };
+
+    const cv = document.getElementById('cv');
+    const ctx = cv.getContext('2d');
+
+    const epiEl = document.getElementById('epi');
+    const popEl = document.getElementById('pop');
+    const epsEl = document.getElementById('eps');
+    const bestEl = document.getElementById('best');
+    const cellSizeEl = document.getElementById('cellSize');
+    const cellSizeValEl = document.getElementById('cellSizeVal');
+    const alphaEl = document.getElementById('alpha');
+    const alphaValEl = document.getElementById('alphaVal');
+    const gammaEl = document.getElementById('gamma');
+    const gammaValEl = document.getElementById('gammaVal');
+    const epsInitEl = document.getElementById('epsInit');
+    const epsInitValEl = document.getElementById('epsInitVal');
+    const epsDecayEl = document.getElementById('epsDecay');
+    const epsDecayValEl = document.getElementById('epsDecayVal');
+
+    const btnRestart = document.getElementById('restart');
+    const btnPause   = document.getElementById('pause');
+    const btnClearQ  = document.getElementById('clearQ');
+
+    popEl.textContent = POP_SIZE;
+
+    let CELL = +cellSizeEl.value;
+    let ALPHA = +alphaEl.value / 100;
+    let GAMMA = +gammaEl.value / 100;
+    let EPS = +epsInitEl.value / 100;
+    let EPS_DECAY = +epsDecayEl.value / 100;
+
+    cellSizeValEl.textContent = CELL;
+    alphaValEl.textContent = ALPHA.toFixed(2);
+    gammaValEl.textContent = GAMMA.toFixed(2);
+    epsInitValEl.textContent = EPS.toFixed(2);
+    eps_decay_display();
+    function eps_decay_display(){ epsDecayValEl.textContent = EPS_DECAY.toFixed(2); epsEl.textContent = EPS.toFixed(2); }
+
+    cellSizeEl.oninput = () => { CELL = +cellSizeEl.value; cellSizeValEl.textContent = CELL; };
+    alphaEl.oninput = () => { ALPHA = +alphaEl.value/100; alphaValEl.textContent = ALPHA.toFixed(2); };
+    gammaEl.oninput = () => { GAMMA = +gammaEl.value/100; gammaValEl.textContent = GAMMA.toFixed(2); };
+    epsInitEl.oninput = () => { EPS = +epsInitEl.value/100; epsInitValEl.textContent = EPS.toFixed(2); eps_decay_display(); };
+    epsDecayEl.oninput = () => { EPS_DECAY = +epsDecayEl.value/100; eps_decay_display(); };
+
+    btnClearQ.onclick = () => { Q.clear(); };
+    btnRestart.onclick = () => { resetAgents(true); EPS = +epsInitEl.value/100; eps_decay_display(); };
+    let paused = false;
+    btnPause.onclick = () => { paused = !paused; btnPause.textContent = paused ? 'Wznów' : 'Pauza'; };
+
+    // --- Labirynt ---
+    const walls = [
+      {x: 0, y: 0, w: W, h: 20},
+      {x: 0, y: H-20, w: W, h: 20},
+      {x: 0, y: 0, w: 20, h: H},
+      {x: W-20, y: 0, w: 20, h: H},
+      {x: 120, y: 80, w: 480, h: 20},
+      {x: 120, y: 80, w: 20, h: 300},
+      {x: 120, y: 360, w: 400, h: 20},
+      {x: 500, y: 140, w: 20, h: 240},
+      {x: 260, y: 140, w: 260, h: 20},
+      {x: 260, y: 200, w: 20, h: 160},
+      {x: 320, y: 260, w: 180, h: 20},
+    ];
+
+    function drawMaze() {
+      ctx.fillStyle = '#333';
+      ctx.fillRect(0,0,W,H);
+      ctx.beginPath(); ctx.fillStyle = '#2ecc71'; ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.fillStyle = '#3498db'; ctx.arc(start.x, start.y, 6, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#777'; for (const w of walls) ctx.fillRect(w.x, w.y, w.w, w.h);
+    }
+
+    function collides(x, y, r=5) {
+      for (const w of walls) {
+        const nx = Math.max(w.x, Math.min(x, w.x + w.w));
+        const ny = Math.max(w.y, Math.min(y, w.y + w.h));
+        const dx = x - nx, dy = y - ny;
+        if (dx*dx + dy*dy <= r*r) return true;
+      }
+      if (x < 20+r || x > W-20-r || y < 20+r || y > H-20-r) return true;
+      return false;
+    }
+
+    // --- Dyskretyzacja stanu ---
+    function toCell(x, y) {
+      const gx = Math.max(20, Math.min(x, W-20-1));
+      const gy = Math.max(20, Math.min(y, H-20-1));
+      const cx = Math.floor((gx-20) / CELL);
+      const cy = Math.floor((gy-20) / CELL);
+      return { cx, cy, key: cx + ',' + cy };
+    }
+
+    function atGoal(x, y) {
+      const dx = x - goal.x, dy = y - goal.y;
+      return dx*dx + dy*dy <= goal.r*goal.r;
+    }
+
+    // --- Akcje ---
+    const ACTIONS = [
+      {dx: 0, dy:-1}, // up
+      {dx: 0, dy: 1}, // down
+      {dx:-1, dy: 0}, // left
+      {dx: 1, dy: 0}, // right
+    ];
+
+    // --- Tablica Q ---
+    const Q = new Map();
+    function ensureQ(key) {
+      if (!Q.has(key)) Q.set(key, new Float32Array(4).fill(0));
+      return Q.get(key);
+    }
+
+    function pickAction(stateKey, eps) {
+      const q = ensureQ(stateKey);
+      if (Math.random() < eps) {
+        return Math.floor(Math.random()*4);
+      } else {
+        let bestA = 0, bestQ = q[0];
+        for (let a=1;a<4;a++) if (q[a] > bestQ) { bestQ = q[a]; bestA = a; }
+        return bestA;
+      }
+    }
+
+    // --- Agent ---
+    class Agent {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = start.x; this.y = start.y;
+        this.r = 3; this.dead = false; this.reached = false;
+        this.steps = 0;
+        const s = toCell(this.x, this.y);
+        this.state = s.key;
+        this.action = pickAction(this.state, EPS);
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.reached ? '#2ecc71' : (this.dead ? '#aa4444' : '#e0e0e0');
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    let agents = [];
+    let episode = 0;
+    let bestTime = null;
+
+    function resetAgents(hard=false) {
+      if (hard) { episode = 0; bestTime = null; }
+      agents = new Array(POP_SIZE).fill(0).map(()=> new Agent());
+      epiEl.textContent = episode;
+      bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
+    }
+    resetAgents();
+
+    // --- Aktualizacja SARSA ---
+    function sarsaUpdate(sKey, a, r, sNextKey, aNext, terminal=false) {
+      const q = ensureQ(sKey);
+      const qNext = ensureQ(sNextKey);
+      const target = terminal ? r : (r + GAMMA * qNext[aNext]);
+      q[a] += ALPHA * (target - q[a]);
+    }
+
+    // --- Pętla ---
+    let t = 0;
+    function loop() {
+      drawMaze();
+
+      if (!paused) {
+        for (const ag of agents) {
+          if (ag.dead || ag.reached) { ag.draw(); continue; }
+
+          const move = ACTIONS[ag.action];
+          const nx = ag.x + move.dx * SPEED;
+          const ny = ag.y + move.dy * SPEED;
+
+          let r = -0.001;
+          let terminal = false;
+
+          if (collides(nx, ny, ag.r)) {
+            r = -1.0; terminal = true;
+            sarsaUpdate(ag.state, ag.action, r, ag.state, ag.action, true);
+            ag.dead = true;
+          } else {
+            ag.x = nx; ag.y = ny;
+            if (atGoal(ag.x, ag.y)) {
+              r = +10.0; terminal = true;
+              const sNext = toCell(ag.x, ag.y);
+              sarsaUpdate(ag.state, ag.action, r, sNext.key, ag.action, true);
+              ag.reached = true;
+              if (bestTime == null || ag.steps < bestTime) bestTime = ag.steps;
+            } else {
+              const sNext = toCell(ag.x, ag.y);
+              const aNext = pickAction(sNext.key, EPS);
+              sarsaUpdate(ag.state, ag.action, r, sNext.key, aNext, false);
+              ag.state = sNext.key;
+              ag.action = aNext;
+            }
+          }
+
+          ag.steps++;
+          if (ag.steps >= STEP_LIMIT && !ag.reached) {
+            sarsaUpdate(ag.state, ag.action, -0.2, ag.state, ag.action, true);
+            ag.dead = true;
+          }
+
+          ag.draw();
+        }
+
+        const epDone = agents.every(a=> a.dead || a.reached);
+        if (epDone) {
+          episode++;
+          epiEl.textContent = episode;
+          bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
+          EPS = Math.max(0.02, EPS * EPS_DECAY);
+          epsEl.textContent = EPS.toFixed(2);
+          for (const a of agents) a.reset();
+          t = 0;
+        } else { t++; }
+      } else {
+        for (const ag of agents) ag.draw();
+      }
+
+      requestAnimationFrame(loop);
+    }
+    loop();
+  </script>
+</body>
+</html>
