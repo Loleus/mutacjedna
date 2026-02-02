@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Neuroewolucja</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         /* === CZCIONKA === */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
@@ -69,7 +70,7 @@
 
         #controls h3 {
             text-align: center;
-            margin: 0 0 12px;
+            margin: 0 0 10px;
             font-size: 18px;
             font-weight: 700;
             color: var(--color-text-main);
@@ -77,10 +78,40 @@
         }
 
         /* === STATYSTYKI === */
-        .row {
+
+        .hist {
             display: flex;
-            justify-content: space-between;
-            margin: 6px 0;
+            width: 100%;
+            justify-content: space-around;
+            margin: 0 0 10px;
+        }
+
+        .hist .pill {
+            width: 32%;
+            padding: 3px 10px 6px;
+            text-align: center;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-panel);
+            text-shadow: var(--shadow-soft);
+            box-shadow: none;
+            border-radius: var(--radius);
+        }
+
+        .pill b {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: 700;
+        }
+
+        .pill #best {
+            color: var(--color-text-green);
+        }
+
+        .pill #pop {
+            color: var(--color-text-yellow);
+        }
+
+        .pill #gen {
             color: var(--color-text-gray);
         }
 
@@ -91,6 +122,7 @@
             border-radius: var(--radius);
             border: 1px solid var(--color-border);
             box-shadow: var(--shadow-medium);
+            margin: 0 0 10px;
         }
 
         .param-line {
@@ -109,20 +141,22 @@
             margin-bottom: 6px;
         }
 
-        /* === PRZYCISKI === */
-        button {
+        .buttons {
+            display: flex;
             width: 100%;
-            margin-top: 10px;
-            padding: 6px 0 8px;
+            justify-content: space-around;
+        }
+
+        button {
             border: none;
-            border-radius: var(--radius);
-            background: var(--color-button);
-            color: var(--color-text-main);
+            transition: all 0.2s;
             cursor: pointer;
-            box-shadow: var(--shadow-medium);
+            color: var(--color-text-main);
+            border-radius: var(--radius);
             text-shadow: var(--shadow-soft);
-            transition: 0.2s;
-            font-size: 15px;
+            box-shadow: var(--shadow-medium);
+            padding: 5px 18px 8px;
+            background: var(--color-button);
         }
 
         button:hover {
@@ -154,21 +188,22 @@
         }
 
         /* === RESPONSYWNOŚĆ === */
-        @media screen and (max-width: 1023px) {
+        @media screen and (max-width: 799px) {
             body {
                 flex-direction: column;
                 align-items: center;
-            }
-
-            #cv {
                 width: 100%;
+            }
+            #controls {
+                min-width: 100vw;
                 max-width: 720px;
             }
 
-            #controls {
-                width: 100%;
-                max-width: 512px;
+            #cv {
+                min-width: 100vw;
+                max-width: 720px;
             }
+
         }
     </style>
 </head>
@@ -177,22 +212,12 @@
     <div id="controls">
 
         <h3>Neuroewolucja</h3>
-
-        <div class="row">
-            <span>Populacja:</span>
-            <span id="pop"></span>
+        <!-- <canvas id="hist" width="280" height="96"></canvas> -->
+        <div class="hist">
+            <span class="pill">Populacja<br><b id="pop"></b></span>
+            <span class="pill">Generacja<br><b id="gen">0</b></span>
+            <span class="pill">Fitness<br><b id="best">0.000</b></span>
         </div>
-
-        <div class="row">
-            <span>Generacja:</span>
-            <span id="gen">0</span>
-        </div>
-
-        <div class="row">
-            <span>Najlepszy fitness:</span>
-            <span id="best">0.000</span>
-        </div>
-
 
         <div class="params">
 
@@ -222,15 +247,15 @@
             <input id="tourSize" type="range" min="2" max="20" value="5">
 
             <label>
-                <input id="tourNoRepeat" type="checkbox" checked/>
+                <input id="tourNoRepeat" type="checkbox" checked />
                 Bez powtórzeń
             </label>
 
         </div>
-
-
-        <button id="restart">Restart</button>
-        <button id="pause">Pauza</button>
+        <div class="buttons">
+            <button id="restart">Restart</button>
+            <button id="pause">Pauza</button>
+        </div>
 
         <p id="desc">
             Algorytm genetyczny optymalizuje wagi sieci neuronowej, która steruje agentem
