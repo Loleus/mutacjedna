@@ -467,7 +467,7 @@ if (hctx) {
   hctx.fillStyle = '#fff';
   hctx.font = '12px sans-serif';
   hctx.textAlign = 'center';
-  hctx.fillText('Fitness histogram', cw / 2, 14);
+  hctx.fillText('Fitness', cw / 2, 14);
   hctx.fillText('0', barW * 0.4, ch - 8);
   hctx.fillText('50', cw / 2, ch - 8);
   hctx.fillText('100', cw - barW * 1.0, ch - 8);
