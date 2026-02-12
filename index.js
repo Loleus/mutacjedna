@@ -266,6 +266,8 @@ function resetPopulation(hard = false) {
   genEl.textContent = generation;
   bestEl.textContent = bestFitness.toFixed(3);
   if (avgEl) avgEl.textContent = (0).toFixed(3);
+  // od razu narysuj pusty histogram z osią i podpisami
+  drawFitnessHistogram();
 }
 
 resetPopulation();
@@ -365,6 +367,62 @@ function pickRank(population) {
   return sorted[n - 1];
 }
 
+// --- Rysowanie histogramu fitnessów ---
+function drawFitnessHistogram() {
+  if (!hctx || !histCanvas) return;
+
+  const bins = 20;
+  const counts = new Array(bins).fill(0);
+
+  if (population && population.length) {
+    for (const a of population) {
+      // bezpieczne pobranie wartości fitness (dla świeżej populacji może być undefined)
+      const rawV = (typeof a._rawFitness === 'number' && isFinite(a._rawFitness))
+        ? a._rawFitness
+        : (typeof a.fitness === 'number' && isFinite(a.fitness) ? a.fitness : 0);
+      const v = Math.max(0, Math.min(1, rawV));
+      let idx = Math.floor(v * bins);
+      if (idx >= bins) idx = bins - 1;
+      if (idx < 0) idx = 0;
+      counts[idx]++;
+    }
+  }
+
+  const cw = histCanvas.width, ch = histCanvas.height;
+  hctx.clearRect(0, 0, cw, ch);
+
+  // tło
+  hctx.fillStyle = '#0b192b';
+  hctx.fillRect(0, 0, cw, ch);
+
+  const maxC = Math.max(1, counts.reduce((m, c) => Math.max(m, c), 0));
+  const barW = cw / bins;
+
+  // gradient dla całego histogramu (od góry do dołu)
+  const gradient = hctx.createLinearGradient(0, 20, 0, ch - 20);
+  gradient.addColorStop(0, '#22cd00ff'); // zielony u góry
+  gradient.addColorStop(1, '#0060df');   // niebieski u dołu
+
+  // słupki
+  for (let i = 0; i < bins; i++) {
+    const h = (counts[i] / maxC) * (ch - 40);
+    const x = i * barW;
+    const y = (ch - 20) - h;
+
+    hctx.fillStyle = gradient;
+    hctx.fillRect(x + 1, y, Math.max(1, barW - 2), h);
+  }
+
+  // podpisy
+  hctx.fillStyle = '#fff';
+  hctx.font = '12px sans-serif';
+  hctx.textAlign = 'center';
+  hctx.fillText('Fitness', cw / 2, 14);
+  hctx.fillText('0', barW * 0.4, ch - 8);
+  hctx.fillText('50', cw / 2, ch - 8);
+  hctx.fillText('100', cw - barW * 1.0, ch - 8);
+}
+
 function evolve() {
   // 1) Oblicz surowe fitnessy
   for (const a of population) a.computeFitness();
@@ -426,52 +484,7 @@ function evolve() {
   if (totalFitEl) totalFitEl.textContent = totalFit.toFixed(3);
 
   // 3b) Rysowanie histogramu fitnessów
-
-if (hctx) {
-  const bins = 20;
-  const counts = new Array(bins).fill(0);
-
-  for (const a of population) {
-    const v = Math.max(0, Math.min(1, a.fitness));
-    let idx = Math.floor(v * bins);
-    if (idx >= bins) idx = bins - 1;
-    counts[idx]++;
-  }
-
-  const cw = histCanvas.width, ch = histCanvas.height;
-  hctx.clearRect(0, 0, cw, ch);
-
-  // tło
-  hctx.fillStyle = '#0b192b';
-  hctx.fillRect(0, 0, cw, ch);
-
-  const maxC = Math.max(1, counts.reduce((m, c) => Math.max(m, c), 0));
-  const barW = cw / bins;
-
-  // gradient dla całego histogramu (od góry do dołu)
-  const gradient = hctx.createLinearGradient(0, 20, 0, ch - 20);
-  gradient.addColorStop(0, '#22cd00ff'); // zielony u góry
-  gradient.addColorStop(1, '#0060df');   // niebieski u dołu
-
-  // słupki
-  for (let i = 0; i < bins; i++) {
-    const h = (counts[i] / maxC) * (ch - 40);
-    const x = i * barW;
-    const y = (ch - 20) - h;
-
-    hctx.fillStyle = gradient;
-    hctx.fillRect(x + 1, y, Math.max(1, barW - 2), h);
-  }
-
-  // podpisy
-  hctx.fillStyle = '#fff';
-  hctx.font = '12px sans-serif';
-  hctx.textAlign = 'center';
-  hctx.fillText('Fitness', cw / 2, 14);
-  hctx.fillText('0', barW * 0.4, ch - 8);
-  hctx.fillText('50', cw / 2, ch - 8);
-  hctx.fillText('100', cw - barW * 1.0, ch - 8);
-}
+  drawFitnessHistogram();
 
   // 4) Statystyki i najlepszy agent
   const best = population.reduce((acc, a) => (!acc || a.fitness > acc.fitness) ? a : acc, null);
