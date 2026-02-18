@@ -4,7 +4,7 @@
 const W = 280, H = 280; // nowy rozmiar canvasa
 const WALL_THICK = 5; // grubość ścian w px
 const POP_SIZE = 100;
-let DNA_LEN = 300;
+let DNA_LEN = 400;
 let MUT_RATE = 0.05;
 let ELITE_COUNT = 5;
 
