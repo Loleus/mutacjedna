@@ -81,7 +81,3 @@ Trzy metody (wybieralne w UI):
 - Używa `Math.random()` (pseudolosowość, brak seedu).
 - Skala: Labirynt 280x280 px, agent r=3 px, prędkość 1.0–3.0 px/krok. Maksymalna odległość ~900 px w 300 krokach, umożliwia eksplorację.
 
-## Zmiany Wprowadzone
-- **Dodanie prędkości jako części genu**: DNA zmienione z `[dx, dy, ...]` na `[kąt, prędkość, ...]`. Każdy gen teraz zawiera kąt i prędkość osobno, co pozwala ewolucji dostosowywać prędkość dynamicznie.
-  - **Wpływ**: Zwiększona eksploracja – agenci mogą ewoluować szybsze lub wolniejsze ruchy, poprawiając przystosowanie.
-  - **Implementacja**: Zaktualizowano `randomDNA()`, `update()`, `mutate()`, `crossover()`. Prędkość losowa 1.0–3.0, mutacja zmienia ją w zakresie 0.75–1.25x, ograniczona 0.5–5.0.
