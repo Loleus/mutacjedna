@@ -155,7 +155,7 @@ class Agent {
     const out = new Float32Array(DNA_LEN * 2);
     for (let i = 0; i < DNA_LEN; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 1.6;
+      const speed = 3.0;
       out[i * 2] = Math.cos(angle) * speed;
       out[i * 2 + 1] = Math.sin(angle) * speed;
     }
@@ -291,7 +291,7 @@ function mutate(dna) {
     if (Math.random() < MUT_RATE) {
       const idx = g * 2;
       const angle = Math.atan2(dna[idx + 1], dna[idx]) + (Math.random() * 1.2 - 0.6);
-      const speed = 1.6 * (1 + (Math.random() * 0.2 - 0.1));
+      const speed = 3 * (1 + (Math.random() * 0.5 - 0.25)); // losowa zmiana prędkości +/-25%
       dna[idx] = Math.cos(angle) * speed;
       dna[idx + 1] = Math.sin(angle) * speed;
     }
