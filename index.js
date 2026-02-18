@@ -140,7 +140,7 @@ class Agent {
     this.dead = false; this.reached = false;
     this.step = 0; this.r = AGENT_R;
 
-    // DNA jako Float32Array [dx,dy, dx,dy, ...]
+    // DNA jako Float32Array [angle, speed, angle, speed, ...] dla DNA_LEN genów
     this.dna = dna ? new Float32Array(dna) : Agent.randomDNA();
 
     // Trail: prealokowana tablica (DNA_LEN+1) par XY
@@ -155,9 +155,9 @@ class Agent {
     const out = new Float32Array(DNA_LEN * 2);
     for (let i = 0; i < DNA_LEN; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 3.0;
-      out[i * 2] = Math.cos(angle) * speed;
-      out[i * 2 + 1] = Math.sin(angle) * speed;
+      const speed = 1.0 + Math.random() * 2.0; // prędkość w zakresie 1.0 - 3.0
+      out[i * 2] = angle;
+      out[i * 2 + 1] = speed;
     }
     return out;
   }
@@ -167,8 +167,10 @@ class Agent {
     if (this.step >= DNA_LEN) { this.dead = true; return; }
 
     const idx = this.step * 2;
-    const dx = this.dna[idx];
-    const dy = this.dna[idx + 1];
+    const angle = this.dna[idx];
+    const speed = this.dna[idx + 1];
+    const dx = Math.cos(angle) * speed;
+    const dy = Math.sin(angle) * speed;
     this.step++;
     const nx = this.x + dx;
     const ny = this.y + dy;
@@ -272,10 +274,10 @@ function resetPopulation(hard = false) {
 
 resetPopulation();
 
-// --- Krzyżowanie (jednopunktowe) dla typowanych tablic [dx,dy, dx,dy, ...] ---
+// --- Krzyżowanie (jednopunktowe) dla typowanych tablic [angle, speed, angle, speed, ...] ---
 function crossover(dna1, dna2) {
   const len = dna1.length; // 2 * DNA_LEN
-  // wybieramy punkt cięcia na granicy genu (pary dx/dy)
+  // wybieramy punkt cięcia na granicy genu (pary angle/speed)
   const geneCount = len >> 1;
   const cutGene = Math.floor(Math.random() * (geneCount + 1));
   const cut = cutGene * 2;
@@ -284,16 +286,20 @@ function crossover(dna1, dna2) {
   return child;
 }
 
-// --- Mutacja dla Float32Array DNA ---
+// --- Mutacja dla Float32Array DNA [angle, speed, ...] ---
 function mutate(dna) {
   // dna długość = DNA_LEN * 2
   for (let g = 0; g < DNA_LEN; g++) {
     if (Math.random() < MUT_RATE) {
       const idx = g * 2;
-      const angle = Math.atan2(dna[idx + 1], dna[idx]) + (Math.random() * 1.2 - 0.6);
-      const speed = 3 * (1 + (Math.random() * 0.5 - 0.25)); // losowa zmiana prędkości +/-25%
-      dna[idx] = Math.cos(angle) * speed;
-      dna[idx + 1] = Math.sin(angle) * speed;
+      // mutacja kąta: +/- 0.6 radiana
+      dna[idx] += (Math.random() * 1.2 - 0.6);
+      // normalizacja kąta do [0, 2*pi]
+      dna[idx] = ((dna[idx] % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      // mutacja prędkości: mnożnik 0.75 - 1.25
+      dna[idx + 1] *= (0.75 + Math.random() * 0.5);
+      // ogranicz prędkość do rozsądnego zakresu
+      dna[idx + 1] = Math.max(0.5, Math.min(5.0, dna[idx + 1]));
     }
   }
 }
