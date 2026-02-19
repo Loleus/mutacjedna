@@ -1,83 +1,99 @@
 # Algorytm Genetyczny: Nawigacja w Labiryncie
 
-## Opis Projektu
-Symulacja algorytmu genetycznego rozwiązującego problem nawigacji w labiryncie. Populacja agentów (kropek) ewoluuje, aby znaleźć optymalną ścieżkę od punktu startowego do celu, unikając ścian. Implementacja w JavaScript z wizualizacją na canvas.
+Populacja agentów z zakodowanym DNA (sekwencja ruchów) ewoluuje w labiryncie 2D, szukając ścieżki od startu do celu. Brak sieci neuronowej — czyste operatory genetyczne na wektorze ruchów.
 
-## Ogólna Struktura Algorytmu
+## Architektura
 
-### Problem
-- Nawigacja w labiryncie 280x280 px od punktu startowego (lewy dolny róg) do celu (prawy górny róg).
-- Labirynt zawiera proste ściany wewnętrzne, symulujące przeszkody.
+### Środowisko
+Labirynt 280×280 px. Ściany zewnętrzne (grubość 5 px) + wewnętrzne przeszkody. Start: lewy dolny róg. Cel: prawy górny róg, promień akceptacji 12 px.
 
-### Reprezentacja Rozwiązania
-- Każde rozwiązanie (agent) ma "DNA" – sekwencję 300 genów (domyślnie `DNA_LEN = 300`).
-- Każdy gen to para `[kąt, prędkość]`, gdzie kąt to kierunek ruchu (0–2π rad), prędkość to odległość w pikselach na krok.
-- DNA przechowywane jako `Float32Array` o długości `2 * DNA_LEN` dla optymalizacji pamięci i wydajności.
+### Agent i DNA
+Każdy agent posiada DNA jako `Float32Array` o długości `2 × DNA_LEN`. Każdy gen to para `[kąt, prędkość]`. Agent wykonuje ruchy sekwencyjnie — gen po genie, krok po kroku:
 
-### Populacja i Cykl Ewolucyjny
-- **Populacja**: 100 agentów (`POP_SIZE = 100`).
-- **Cykl**:
-  1. **Symulacja ruchu**: W każdej epoce (od `t=0` do `t=DNA_LEN-1`) wszyscy agenci wykonują jeden krok: `dx = cos(kąt) * prędkość`, `dy = sin(kąt) * prędkość`.
-  2. **Ocena fitness**: Po wykonaniu wszystkich kroków obliczany jest fitness.
-  3. **Ewolucja**: Selekcja rodziców, krzyżowanie, mutacja, tworzenie nowej populacji (z elitaryzmem i imigrantami).
-  4. **Powtórzenie**: Cykl trwa w nieskończoność z wizualizacją na canvas.
-- Algorytm jest deterministyczny w ramach symulacji, ale losowość wprowadza różnorodność.
+- `dx = cos(kąt) × prędkość`
+- `dy = sin(kąt) × prędkość`
 
-## Mechanizmy Kluczowe
+Kolizja ze ścianą = śmierć. Dotarcie do strefy celu = sukces. Wyczerpanie DNA = śmierć.
 
-### Generowanie DNA
-- Losowy kąt (0–2π) i prędkość (1.0–3.0 px/krok).
-- Wzór ruchu: `dx = cos(kąt) * prędkość`, `dy = sin(kąt) * prędkość`.
+Zakres inicjalizacji: kąt 0–2π, prędkość 1.0–3.0 px/krok.
 
-### Ruch Agenta
-- Krok po kroku z kontrolą kolizji (aproksymacja okrąg-prostokąt).
-- Agent zatrzymuje się po uderzeniu w ścianę lub wykonaniu wszystkich kroków.
-- Ślad (trail) rysowany dla wizualizacji.
+## Algorytm Genetyczny
+
+### Parametry
+
+| Parametr | Zakres / Wartość | Restart? |
+|:---|:---|:---|
+| Długość DNA | 100–600 (domyślnie 400) | Tak |
+| Mutacja | 1%–30% (domyślnie 5%) | Nie |
+| Elita | 1–10 (domyślnie 5) | Nie |
+| Metoda selekcji | Ruletka / Turniej / Ranking | Nie |
+| Rozmiar turnieju | 2–100 (domyślnie 5) | Nie |
+| Turniej bez powtórzeń | checkbox | Nie |
+| Imigranci | 15% populacji | Stałe |
+
+Populacja: 100 agentów.
 
 ### Fitness
-Składa się z trzech komponentów (ważonych):
-- **Postęp** (80% wagi): `(1 - odległość_do_celu / odległość_start-cel)`, zakres [0,1]. Nagroda za zbliżenie.
-- **Przetrwanie** (10% wagi): `(liczba_wykonanych_kroków / DNA_LEN)`, zakres [0,1]. Nagroda za dłuższe życie.
-- **Bonus za dotarcie** (10% wagi): Jeśli dotrze, bonus `0.6 + (1 - kroki/DNA_LEN) * 0.4`.
-- **Normalizacja**: Surowy fitness normalizowany do [0,1] z potęgą 1.2 dla nacisku na lepsze.
-- **Fitness sharing**: Obniża fitness w "tłoku" (promień 7 px), promując nisze ewolucyjne.
+
+Surowy fitness w zakresie [0, 1], trzy składniki:
+
+| Składnik | Waga | Obliczenie |
+|:---|:---|:---|
+| Postęp | 80% | `1 − (dystans_do_celu / dystans_start→cel)` |
+| Przetrwanie | 10% | `wykonane_kroki / DNA_LEN` |
+| Bonus za dotarcie | 10% | `0.6 + (1 − kroki/DNA_LEN) × 0.4` (tylko przy sukcesie) |
+
+Po obliczeniu surowego fitness:
+1. **Normalizacja** do [0, 1] względem min/max populacji, z potęgą 1.2 (nacisk na lepszych).
+2. **Fitness sharing** — obniżenie fitness agentów w promieniu 7 px od siebie. Promuje niszowanie i zapobiega grupowaniu się w jednym punkcie.
 
 ### Selekcja
-Trzy metody (wybieralne w UI):
-- **Ruletka**: Prawdopodobieństwo proporcjonalne do fitnessu.
-- **Turniej**: Losowanie k=5–50 agentów (domyślnie 15), wybór najlepszego. Opcja "bez powtórzeń".
-- **Ranking**: Wybór wg liniowego rozkładu rang.
+
+Trzy metody do wyboru w UI:
+
+**Ruletka** — prawdopodobieństwo proporcjonalne do fitness (po sharingu).
+
+**Turniej** — losuje k kandydatów, zwycięzca = najwyższy fitness. Opcja bez powtórzeń (częściowy Fisher-Yates).
+
+**Ranking** — sortowanie rosnące po fitness, wybór wg liniowego rozkładu rang (waga = pozycja).
 
 ### Krzyżowanie
-- Jednopunktowe na poziomie genów (para [kąt, prędkość]).
-- Punkt cięcia losowy.
+Jednopunktowe na granicy genu. Punkt cięcia losowy spośród `DNA_LEN` genów. Dziecko dziedziczy geny 0..cut od rodzica A, resztę od rodzica B.
 
 ### Mutacja
-- Prawdopodobieństwo `MUT_RATE = 0.05` (5%) na gen.
-- Zmiana: kąt ±0.6 rad (z normalizacją), prędkość * (0.75–1.25), ograniczona do [0.5, 5.0].
+Per-genowa z prawdopodobieństwem `MUT_RATE`:
+- Kąt: perturbacja ±0.6 rad, normalizacja do [0, 2π].
+- Prędkość: mnożnik 0.75–1.25, clamp do [0.5, 5.0].
 
 ### Elitaryzm i Imigranci
-- **Elitaryzm**: `ELITE_COUNT = 5` najlepszych przechodzi bez zmian.
-- **Imigranci**: 15% populacji – losowe nowe agenty.
+Elita: top N osobników kopiowanych wprost (bez mutacji). Imigranci: 15% populacji nadpisywane losowymi agentami — przeciwdziałanie stagnacji.
 
-### Wizualizacja
-- Canvas 280x280 px, histogram fitnessu, statystyki (najlepszy, średni, całkowity fitness).
+## Wizualizacja
 
-## Matematyczna Analiza
+- **Ślady agentów** — opcjonalny offscreen canvas z inkrementalnym rysowaniem (quadratic smoothing). Przełącznik w UI.
+- **Trasa najlepszego** — najlepsza historyczna trajektoria rysowana na wierzchu.
+- **Średnia trasa** — uśredniona pozycja populacji w każdym kroku.
+- **Histogram fitness** — rozkład surowego fitness w 20 binach.
+- **Statystyki** — najlepszy i średni fitness (w %), numer generacji, żywe agenty.
 
-### Przestrzeń Rozwiązań
-- Każde DNA to punkt w R^{600} (300 par [kąt, prędkość]).
-- Ruch deterministyczny, ewolucja eksploruje przestrzeń mutacjami i krzyżowaniem.
+## Szczegóły implementacyjne
 
-### Konwergencja
-- Dążenie do lokalnych optimum; fitness sharing zapobiega przedwczesnej konwergencji.
+- DNA i trajektorie jako `Float32Array` (optymalizacja pamięci).
+- Kolizja: test przecięcia okręgu z prostokątem (nearest point on AABB).
+- Offscreen canvas buforuje ślady — unika przerysowywania wszystkich tras co klatkę.
+- Pętla: `requestAnimationFrame`, jeden krok DNA na klatkę.
+- Cykl: symulacja (t: 0 → DNA_LEN) → evolve() → reset kroków → nowa generacja.
 
-### Złożoność
-- Symulacja ruchu: O(POP_SIZE * DNA_LEN) na epokę.
-- Ewolucja: O(POP_SIZE²) dla fitness sharing.
-- Całkowita: O(POP_SIZE² + POP_SIZE * DNA_LEN) na generację – akceptowalna dla małych populacji.
+### Złożoność na generację
 
-### Losowość i Skala
-- Używa `Math.random()` (pseudolosowość, brak seedu).
-- Skala: Labirynt 280x280 px, agent r=3 px, prędkość 1.0–3.0 px/krok. Maksymalna odległość ~900 px w 300 krokach, umożliwia eksplorację.
+| Operacja | Koszt |
+|:---|:---|
+| Symulacja ruchu | O(POP_SIZE × DNA_LEN) |
+| Fitness sharing | O(POP_SIZE²) |
+| Selekcja + krzyżowanie | O(POP_SIZE × k) |
+| **Łącznie** | **O(POP_SIZE² + POP_SIZE × DNA_LEN)** |
 
+## Stack
+
+HTML5 Canvas (main + offscreen buffer), vanilla JS, requestAnimationFrame.
+```
