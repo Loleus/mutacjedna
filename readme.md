@@ -92,8 +92,3 @@ Elita: top N osobników kopiowanych wprost (bez mutacji). Imigranci: 15% populac
 | Fitness sharing | O(POP_SIZE²) |
 | Selekcja + krzyżowanie | O(POP_SIZE × k) |
 | **Łącznie** | **O(POP_SIZE² + POP_SIZE × DNA_LEN)** |
-
-## Stack
-
-HTML5 Canvas (main + offscreen buffer), vanilla JS, requestAnimationFrame.
-```
