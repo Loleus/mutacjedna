@@ -1,31 +1,72 @@
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
   <meta charset="UTF-8" />
   <title>Q-learning: 100 kropek w labiryncie</title>
   <style>
-    body { font-family: system-ui, sans-serif; background:#111; color:#eee; display:flex; gap:24px; }
-    #ui { width: 320px; }
-    canvas { background:#222; border:1px solid #444; }
-    .pill { background:#333; padding:6px 10px; border-radius:6px; display:inline-block; margin-right:8px; }
-    label { display:block; margin:8px 0 4px; font-size:14px; color:#ccc; }
-    input[type=range] { width:100%; }
-    button { padding:8px 12px; background:#444; color:#eee; border:none; cursor:pointer; }
-    button:hover { background:#555; }
-    .hint { color:#aaa; font-size:13px; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      gap: 24px;
+    }
+
+    #ui {
+      width: 320px;
+    }
+
+    canvas {
+      background: #222;
+      border: 1px solid #444;
+    }
+
+    .pill {
+      background: #333;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    label {
+      display: block;
+      margin: 8px 0 4px;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    input[type=range] {
+      width: 100%;
+    }
+
+    button {
+      padding: 8px 12px;
+      background: #444;
+      color: #eee;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #555;
+    }
+
+    .hint {
+      color: #aaa;
+      font-size: 13px;
+    }
   </style>
 </head>
+
 <body>
   <div id="ui">
     <h2>Q-learning w labiryncie</h2>
-    <div><span class="pill">Populacja: <b id="pop">100</b></span><span class="pill">Epizod: <b id="epi">0</b></span></div>
-    <div><span class="pill">Epsilon: <b id="eps">0.30</b></span><span class="pill">Najlepszy czas: <b id="best">—</b></span></div>
+    <div><span class="pill">Populacja: <b id="pop">100</b></span><span class="pill">Epizod: <b id="epi">0</b></span>
+    </div>
+    <div><span class="pill">Epsilon: <b id="eps">0.30</b></span><span class="pill">Najlepszy czas: <b
+          id="best">—</b></span></div>
 
     <label>Rozmiar komórki siatki (px)</label>
     <input id="cellSize" type="range" min="10" max="40" value="20">
@@ -63,16 +104,16 @@
   </div>
 
   <canvas id="cv" width="720" height="520"></canvas>
-
+<!-- 
   <script>
     // --- Parametry ogólne ---
     const W = 720, H = 520;
     const POP_SIZE = 100;
-    const SPEED = 2.0;
-    const STEP_LIMIT = 2000;
+    const SPEED = 3.0;           // było 2.0
+    const STEP_LIMIT = 4000;     // było 2000
 
     const start = { x: 50, y: H - 50 };
-    const goal  = { x: W - 70, y: 60, r: 18 };
+    const goal = { x: W - 70, y: 60, r: 18 };
 
     const cv = document.getElementById('cv');
     const ctx = cv.getContext('2d');
@@ -93,8 +134,8 @@
     const epsDecayValEl = document.getElementById('epsDecayVal');
 
     const btnRestart = document.getElementById('restart');
-    const btnPause   = document.getElementById('pause');
-    const btnClearQ  = document.getElementById('clearQ');
+    const btnPause = document.getElementById('pause');
+    const btnClearQ = document.getElementById('clearQ');
 
     popEl.textContent = POP_SIZE;
 
@@ -109,49 +150,49 @@
     gammaValEl.textContent = GAMMA.toFixed(2);
     epsInitValEl.textContent = EPS.toFixed(2);
     eps_decay_display();
-    function eps_decay_display(){ epsDecayValEl.textContent = EPS_DECAY.toFixed(2); epsEl.textContent = EPS.toFixed(2); }
+    function eps_decay_display() { epsDecayValEl.textContent = EPS_DECAY.toFixed(2); epsEl.textContent = EPS.toFixed(2); }
 
     cellSizeEl.oninput = () => { CELL = +cellSizeEl.value; cellSizeValEl.textContent = CELL; };
-    alphaEl.oninput = () => { ALPHA = +alphaEl.value/100; alphaValEl.textContent = ALPHA.toFixed(2); };
-    gammaEl.oninput = () => { GAMMA = +gammaEl.value/100; gammaValEl.textContent = GAMMA.toFixed(2); };
-    epsInitEl.oninput = () => { EPS = +epsInitEl.value/100; epsInitValEl.textContent = EPS.toFixed(2); eps_decay_display(); };
-    epsDecayEl.oninput = () => { EPS_DECAY = +epsDecayEl.value/100; eps_decay_display(); };
+    alphaEl.oninput = () => { ALPHA = +alphaEl.value / 100; alphaValEl.textContent = ALPHA.toFixed(2); };
+    gammaEl.oninput = () => { GAMMA = +gammaEl.value / 100; gammaValEl.textContent = GAMMA.toFixed(2); };
+    epsInitEl.oninput = () => { EPS = +epsInitEl.value / 100; epsInitValEl.textContent = EPS.toFixed(2); eps_decay_display(); };
+    epsDecayEl.oninput = () => { EPS_DECAY = +epsDecayEl.value / 100; eps_decay_display(); };
 
     btnClearQ.onclick = () => { Q.clear(); };
-    btnRestart.onclick = () => { resetAgents(true); EPS = +epsInitEl.value/100; eps_decay_display(); };
+    btnRestart.onclick = () => { resetAgents(true); EPS = +epsInitEl.value / 100; eps_decay_display(); };
     let paused = false;
     btnPause.onclick = () => { paused = !paused; btnPause.textContent = paused ? 'Wznów' : 'Pauza'; };
 
     // --- Labirynt: ściany ---
     const walls = [
-      {x: 0, y: 0, w: W, h: 20},
-      {x: 0, y: H-20, w: W, h: 20},
-      {x: 0, y: 0, w: 20, h: H},
-      {x: W-20, y: 0, w: 20, h: H},
+      { x: 0, y: 0, w: W, h: 20 },
+      { x: 0, y: H - 20, w: W, h: 20 },
+      { x: 0, y: 0, w: 20, h: H },
+      { x: W - 20, y: 0, w: 20, h: H },
 
-      {x: 120, y: 80, w: 480, h: 20},
-      {x: 120, y: 80, w: 20, h: 300},
-      {x: 120, y: 360, w: 400, h: 20},
-      {x: 500, y: 140, w: 20, h: 240},
-      {x: 260, y: 140, w: 260, h: 20},
-      {x: 260, y: 200, w: 20, h: 160},
-      {x: 320, y: 260, w: 180, h: 20},
+      { x: 120, y: 80, w: 480, h: 20 },
+      { x: 120, y: 80, w: 20, h: 300 },
+      { x: 120, y: 360, w: 400, h: 20 },
+      { x: 500, y: 140, w: 20, h: 240 },
+      { x: 260, y: 140, w: 260, h: 20 },
+      { x: 260, y: 200, w: 20, h: 160 },
+      { x: 320, y: 260, w: 180, h: 20 },
     ];
 
     function drawMaze() {
       ctx.fillStyle = '#333';
-      ctx.fillRect(0,0,W,H);
+      ctx.fillRect(0, 0, W, H);
 
       // goal
       ctx.beginPath();
       ctx.fillStyle = '#2ecc71';
-      ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI*2);
+      ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI * 2);
       ctx.fill();
 
       // start
       ctx.beginPath();
       ctx.fillStyle = '#3498db';
-      ctx.arc(start.x, start.y, 6, 0, Math.PI*2);
+      ctx.arc(start.x, start.y, 6, 0, Math.PI * 2);
       ctx.fill();
 
       // walls
@@ -160,42 +201,42 @@
 
       // grid overlay (opcjonalnie)
       ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-      for (let x=20; x<=W-20; x+=CELL) { ctx.beginPath(); ctx.moveTo(x,20); ctx.lineTo(x,H-20); ctx.stroke(); }
-      for (let y=20; y<=H-20; y+=CELL) { ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(W-20,y); ctx.stroke(); }
+      for (let x = 20; x <= W - 20; x += CELL) { ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, H - 20); ctx.stroke(); }
+      for (let y = 20; y <= H - 20; y += CELL) { ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(W - 20, y); ctx.stroke(); }
     }
 
-    function collides(x, y, r=3) {
+    function collides(x, y, r = 3) {
       for (const w of walls) {
         const nx = Math.max(w.x, Math.min(x, w.x + w.w));
         const ny = Math.max(w.y, Math.min(y, w.y + w.h));
         const dx = x - nx, dy = y - ny;
-        if (dx*dx + dy*dy <= r*r) return true;
+        if (dx * dx + dy * dy <= r * r) return true;
       }
-      if (x < 20+r || x > W-20-r || y < 20+r || y > H-20-r) return true;
+      if (x < 20 + r || x > W - 20 - r || y < 20 + r || y > H - 20 - r) return true;
       return false;
     }
 
     // --- Dyskretyzacja stanu (siatka) ---
     function toCell(x, y) {
       // ogranicz do wewnętrznej przestrzeni (bez ramki 20px)
-      const gx = Math.max(20, Math.min(x, W-20-1));
-      const gy = Math.max(20, Math.min(y, H-20-1));
-      const cx = Math.floor((gx-20) / CELL);
-      const cy = Math.floor((gy-20) / CELL);
+      const gx = Math.max(20, Math.min(x, W - 20 - 1));
+      const gy = Math.max(20, Math.min(y, H - 20 - 1));
+      const cx = Math.floor((gx - 20) / CELL);
+      const cy = Math.floor((gy - 20) / CELL);
       return { cx, cy, key: cx + ',' + cy };
     }
 
     function atGoal(x, y) {
       const dx = x - goal.x, dy = y - goal.y;
-      return dx*dx + dy*dy <= goal.r*goal.r;
+      return dx * dx + dy * dy <= goal.r * goal.r;
     }
 
     // --- Akcje: 0:up, 1:down, 2:left, 3:right ---
     const ACTIONS = [
-      {dx: 0,  dy:-1},
-      {dx: 0,  dy: 1},
-      {dx:-1,  dy: 0},
-      {dx: 1,  dy: 0},
+      { dx: 0, dy: -1 },
+      { dx: 0, dy: 1 },
+      { dx: -1, dy: 0 },
+      { dx: 1, dy: 0 },
     ];
 
     // --- Tablica Q: Map<stateKey, Float32Array(4)>
@@ -208,11 +249,11 @@
     function pickAction(stateKey, eps) {
       const q = ensureQ(stateKey);
       if (Math.random() < eps) {
-        return Math.floor(Math.random()*4);
+        return Math.floor(Math.random() * 4);
       } else {
         // argmax
         let bestA = 0, bestQ = q[0];
-        for (let a=1;a<4;a++) if (q[a] > bestQ) { bestQ = q[a]; bestA = a; }
+        for (let a = 1; a < 4; a++) if (q[a] > bestQ) { bestQ = q[a]; bestA = a; }
         return bestA;
       }
     }
@@ -220,7 +261,7 @@
     function maxQ(stateKey) {
       const q = ensureQ(stateKey);
       let m = q[0];
-      for (let a=1;a<4;a++) if (q[a] > m) m = q[a];
+      for (let a = 1; a < 4; a++) if (q[a] > m) m = q[a];
       return m;
     }
 
@@ -240,7 +281,7 @@
       draw() {
         ctx.beginPath();
         ctx.fillStyle = this.reached ? '#2ecc71' : (this.dead ? '#aa4444' : '#e0e0e0');
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -249,16 +290,16 @@
     let episode = 0;
     let bestTime = null;
 
-    function resetAgents(hard=false) {
+    function resetAgents(hard = false) {
       if (hard) { episode = 0; bestTime = null; }
-      agents = new Array(POP_SIZE).fill(0).map(()=> new Agent());
+      agents = new Array(POP_SIZE).fill(0).map(() => new Agent());
       epiEl.textContent = episode;
       bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
     }
     resetAgents();
 
     // --- Aktualizacja Q: Q[s,a] += alpha * (r + gamma*maxQ(s') - Q[s,a]) ---
-    function qUpdate(sKey, a, r, sNextKey, terminal=false) {
+    function qUpdate(sKey, a, r, sNextKey, terminal = false) {
       const q = ensureQ(sKey);
       const target = terminal ? r : (r + GAMMA * maxQ(sNextKey));
       q[a] += ALPHA * (target - q[a]);
@@ -316,7 +357,7 @@
         }
 
         // warunek końca epizodu
-        const epDone = agents.every(a=> a.dead || a.reached);
+        const epDone = agents.every(a => a.dead || a.reached);
         if (epDone) {
           episode++;
           epiEl.textContent = episode;
@@ -340,6 +381,315 @@
       requestAnimationFrame(loop);
     }
     loop();
-  </script>
+  </script> -->
+<script>
+    // --- Parametry ogólne ---
+    const W = 720, H = 520;
+    const POP_SIZE = 100;
+    const SPEED = 3.2;
+    const STEP_LIMIT = 5000;
+
+    const start = { x: 50, y: H - 50 };
+    const goal  = { x: W - 70, y: 60, r: 18 };
+
+    const cv = document.getElementById('cv');
+    const ctx = cv.getContext('2d');
+
+    const epiEl = document.getElementById('epi');
+    const popEl = document.getElementById('pop');
+    const epsEl = document.getElementById('eps');
+    const bestEl = document.getElementById('best');
+    const cellSizeEl = document.getElementById('cellSize');
+    const cellSizeValEl = document.getElementById('cellSizeVal');
+    const alphaEl = document.getElementById('alpha');
+    const alphaValEl = document.getElementById('alphaVal');
+    const gammaEl = document.getElementById('gamma');
+    const gammaValEl = document.getElementById('gammaVal');
+    const epsInitEl = document.getElementById('epsInit');
+    const epsInitValEl = document.getElementById('epsInitVal');
+    const epsDecayEl = document.getElementById('epsDecay');
+    const epsDecayValEl = document.getElementById('epsDecayVal');
+
+    const btnRestart = document.getElementById('restart');
+    const btnPause   = document.getElementById('pause');
+    const btnClearQ  = document.getElementById('clearQ');
+
+    popEl.textContent = POP_SIZE;
+
+    // ==================== ZOPTYMALIZOWANE PARAMETRY ====================
+    let CELL = 15;
+    let ALPHA = 0.22;
+    let GAMMA = 0.965;
+    let EPS = 0.45;
+    let EPS_DECAY = 0.9925;
+
+    const REWARD_GOAL = 35.0;
+    const PENALTY_STEP = -0.018;
+    const PENALTY_WALL = -10.0;
+    const PENALTY_TIMEOUT = -4.0;
+    const SHAPING_FACTOR = 0.12;
+    // ===================================================================
+
+    // Inicjalizacja wartości w UI
+    cellSizeValEl.textContent = CELL;
+    alphaValEl.textContent = ALPHA.toFixed(2);
+    gammaValEl.textContent = GAMMA.toFixed(3);
+    epsInitValEl.textContent = EPS.toFixed(2);
+    epsDecayValEl.textContent = EPS_DECAY.toFixed(4);
+    epsEl.textContent = EPS.toFixed(3);
+
+    cellSizeEl.value = CELL;
+    alphaEl.value = ALPHA * 100;
+    gammaEl.value = GAMMA * 100;
+    epsInitEl.value = EPS * 100;
+    epsDecayEl.value = Math.round(EPS_DECAY * 1000);
+
+    // Obsługa sliderów
+    cellSizeEl.oninput = () => { CELL = +cellSizeEl.value; cellSizeValEl.textContent = CELL; };
+    alphaEl.oninput = () => { ALPHA = +alphaEl.value/100; alphaValEl.textContent = ALPHA.toFixed(2); };
+    gammaEl.oninput = () => { GAMMA = +gammaEl.value/100; gammaValEl.textContent = GAMMA.toFixed(3); };
+    epsInitEl.oninput = () => { 
+        EPS = +epsInitEl.value/100; 
+        epsInitValEl.textContent = EPS.toFixed(2); 
+        epsEl.textContent = EPS.toFixed(3);
+    };
+    epsDecayEl.oninput = () => { 
+        EPS_DECAY = +epsDecayEl.value/1000; 
+        epsDecayValEl.textContent = EPS_DECAY.toFixed(4); 
+    };
+
+    btnClearQ.onclick = () => { Q.clear(); };
+    btnRestart.onclick = () => { 
+        resetAgents(true); 
+        EPS = +epsInitEl.value/100; 
+        epsEl.textContent = EPS.toFixed(3);
+    };
+    
+    let paused = false;
+    btnPause.onclick = () => { 
+        paused = !paused; 
+        btnPause.textContent = paused ? 'Wznów' : 'Pauza'; 
+    };
+
+    // --- Labirynt ---
+    const walls = [
+      {x: 0, y: 0, w: W, h: 20},
+      {x: 0, y: H-20, w: W, h: 20},
+      {x: 0, y: 0, w: 20, h: H},
+      {x: W-20, y: 0, w: 20, h: H},
+
+      {x: 120, y: 80, w: 480, h: 20},
+      {x: 120, y: 80, w: 20, h: 300},
+      {x: 120, y: 360, w: 400, h: 20},
+      {x: 500, y: 140, w: 20, h: 240},
+      {x: 260, y: 140, w: 260, h: 20},
+      {x: 260, y: 200, w: 20, h: 160},
+      {x: 320, y: 260, w: 180, h: 20},
+    ];
+
+    function drawMaze() {
+      ctx.fillStyle = '#222';
+      ctx.fillRect(0, 0, W, H);
+
+      // Cel
+      ctx.beginPath();
+      ctx.fillStyle = '#2ecc71';
+      ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI*2);
+      ctx.fill();
+
+      // Start
+      ctx.beginPath();
+      ctx.fillStyle = '#3498db';
+      ctx.arc(start.x, start.y, 9, 0, Math.PI*2);
+      ctx.fill();
+
+      // Ściany
+      ctx.fillStyle = '#777';
+      for (const w of walls) ctx.fillRect(w.x, w.y, w.w, w.h);
+
+      // Siatka
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      for (let x = 20; x <= W-20; x += CELL) {
+        ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, H-20); ctx.stroke();
+      }
+      for (let y = 20; y <= H-20; y += CELL) {
+        ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(W-20, y); ctx.stroke();
+      }
+    }
+
+    function collides(x, y, r = 4) {
+      for (const w of walls) {
+        const nx = Math.max(w.x, Math.min(x, w.x + w.w));
+        const ny = Math.max(w.y, Math.min(y, w.y + w.h));
+        const dx = x - nx, dy = y - ny;
+        if (dx*dx + dy*dy <= r*r) return true;
+      }
+      if (x < 24 || x > W-24 || y < 24 || y > H-24) return true;
+      return false;
+    }
+
+    function toCell(x, y) {
+      const gx = Math.max(20, Math.min(x, W-21));
+      const gy = Math.max(20, Math.min(y, H-21));
+      const cx = Math.floor((gx-20) / CELL);
+      const cy = Math.floor((gy-20) / CELL);
+      return { cx, cy, key: cx + ',' + cy };
+    }
+
+    function atGoal(x, y) {
+      const dx = x - goal.x, dy = y - goal.y;
+      return dx*dx + dy*dy <= goal.r * goal.r;
+    }
+
+    const ACTIONS = [
+      {dx: 0,  dy: -1}, // góra
+      {dx: 0,  dy:  1}, // dół
+      {dx:-1,  dy:  0}, // lewo
+      {dx: 1,  dy:  0}  // prawo
+    ];
+
+    // Tablica Q
+    const Q = new Map();
+    function ensureQ(key) {
+      if (!Q.has(key)) Q.set(key, new Float32Array(4).fill(0));
+      return Q.get(key);
+    }
+
+    function pickAction(stateKey, eps) {
+      const q = ensureQ(stateKey);
+      if (Math.random() < eps) return Math.floor(Math.random() * 4);
+      
+      let bestA = 0, bestQ = q[0];
+      for (let a = 1; a < 4; a++) {
+        if (q[a] > bestQ) { bestQ = q[a]; bestA = a; }
+      }
+      return bestA;
+    }
+
+    function maxQ(stateKey) {
+      const q = ensureQ(stateKey);
+      let m = q[0];
+      for (let a = 1; a < 4; a++) if (q[a] > m) m = q[a];
+      return m;
+    }
+
+    class Agent {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = start.x;
+        this.y = start.y;
+        this.r = 4;
+        this.dead = false;
+        this.reached = false;
+        this.steps = 0;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.reached ? '#2ecc71' : (this.dead ? '#e74c3c' : '#ecf0f1');
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    let agents = [];
+    let episode = 0;
+    let bestTime = null;
+
+    function resetAgents(hard = false) {
+      if (hard) {
+        episode = 0;
+        bestTime = null;
+        Q.clear();
+      }
+      agents = new Array(POP_SIZE).fill(0).map(() => new Agent());
+      epiEl.textContent = episode;
+      bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
+    }
+
+    function qUpdate(sKey, a, r, sNextKey, terminal = false) {
+      const q = ensureQ(sKey);
+      const target = terminal ? r : (r + GAMMA * maxQ(sNextKey));
+      q[a] += ALPHA * (target - q[a]);
+    }
+
+    function loop() {
+      drawMaze();
+
+      if (!paused) {
+        for (const ag of agents) {
+          if (ag.dead || ag.reached) {
+            ag.draw();
+            continue;
+          }
+
+          const s = toCell(ag.x, ag.y);
+          const a = pickAction(s.key, EPS);
+          const move = ACTIONS[a];
+          const nx = ag.x + move.dx * SPEED;
+          const ny = ag.y + move.dy * SPEED;
+
+          let r = PENALTY_STEP;
+          let terminal = false;
+          let nextKey = null;
+
+          const distBefore = Math.hypot(ag.x - goal.x, ag.y - goal.y);
+
+          if (collides(nx, ny, ag.r)) {
+            r = PENALTY_WALL;
+            terminal = true;
+            nextKey = s.key;
+            ag.dead = true;
+          } else {
+            ag.x = nx;
+            ag.y = ny;
+            const distAfter = Math.hypot(ag.x - goal.x, ag.y - goal.y);
+            
+            r += (distBefore - distAfter) * SHAPING_FACTOR;   // shaping nagród
+
+            if (atGoal(ag.x, ag.y)) {
+              r = REWARD_GOAL;
+              terminal = true;
+              nextKey = toCell(ag.x, ag.y).key;
+              ag.reached = true;
+              if (bestTime == null || ag.steps < bestTime) bestTime = ag.steps;
+            } else {
+              nextKey = toCell(ag.x, ag.y).key;
+            }
+          }
+
+          qUpdate(s.key, a, r, nextKey, terminal);
+
+          ag.steps++;
+          if (ag.steps >= STEP_LIMIT && !ag.reached) {
+            qUpdate(s.key, a, PENALTY_TIMEOUT, s.key, true);
+            ag.dead = true;
+          }
+
+          ag.draw();
+        }
+
+        // Koniec epizodu
+        if (agents.every(a => a.dead || a.reached)) {
+          episode++;
+          epiEl.textContent = episode;
+          bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
+
+          EPS = Math.max(0.02, EPS * EPS_DECAY);
+          epsEl.textContent = EPS.toFixed(3);
+
+          for (const a of agents) a.reset();
+        }
+      } else {
+        for (const ag of agents) ag.draw();
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    resetAgents();
+    loop();
+</script>
+
 </body>
+
 </html>

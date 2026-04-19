@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Q-learning w labiryncie</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+:root {
+  --color-bg-panel: #0b192b;
+  --color-bg-gradient-1: #0b0a2d;
+  --color-bg-gradient-2: #1b375c;
+  --color-text-main: #eee;
+  --color-text-green: #1ccf00;
+  --color-text-yellow: #ecd53f;
+  --color-text-gray: #d0d0d0;
+  --color-border: #2f61d5;
+  --color-button: #b90000;
+  --color-button-hover: #ff5858;
+  --color-shadow: rgba(0, 0, 0, 0.6);
+  --shadow-big-blur: 12px;
+  --shadow-medium: 0 0 var(--shadow-big-blur) var(--color-shadow);
+  --shadow-soft: 1px 1px 2px var(--color-shadow);
+  --radius: 10px;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  overflow: auto;
+  min-height: 100vh;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  font-family: "Noto Sans", system-ui, sans-serif, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-size: 14px;
+  color: var(--color-text-main);
+  background-image: linear-gradient(45deg, var(--color-bg-gradient-1), var(--color-bg-gradient-2) 50%, var(--color-bg-gradient-1) 100%),
+  url('./bdg.jpg');
+  background-blend-mode: multiply;
+  background-size: cover;
+}
+
+/* GŁÓWNY LAYOUT 3 KOLUMN */
+#layout {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  max-width: 1500px;
+}
+
+/* WSPÓLNE DLA PANELI */
+#ui, .mid, #controls {
+  overflow: auto;
+  display: flex;
+  min-width: 320px;
+  width: 320px;
+  flex-direction: column;
+  justify-content: flex-start;
+  line-height: 1.5;
+  max-height: calc(100vh - 28px);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--color-bg-panel);
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--color-border);
+}
+
+/* LEWA KOLUMNA – UI */
+#ui {
+  gap:7px;
+  line-height: 1.33;
+}
+
+/* ŚRODKOWA KOLUMNA – CANVAS */
+.mid {
+  gap: 18px;
+  width: 720px;
+}
+
+/* PRAWA KOLUMNA – OPIS */
+#controls {
+  width: 660px;
+  text-align: justify;
+  color: var(--color-text-gray);
+}
+
+/* DODATKOWE KLASY Z TWOJEGO STYLU */
+.params {
+  background: var(--color-bg-panel);
+  padding: 5px var(--radius) var(--radius);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--color-border);
+}
+p {
+  text-indent: 18px;
+  margin-bottom: 8px;
+}
+h2, h3 {
+  color: var(--color-text-main);
+  text-shadow: 0 0 var(--shadow-big-blur) var(--color-border);
+}
+h2 {
+  font-weight: 800;
+  text-align: center;
+  font-size: 1.7em;
+}
+h3 {
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+label {
+  display: inline-block;
+  margin: 12px 0 6px;
+  color: var(--color-text-gray);
+}
+#controls ul, .center ul {
+  margin-left: 18px;
+  margin-bottom: 8px;
+  color: var(--color-text-gray);
+}
+.center ul {
+  margin-bottom:0;
+}
+.history p {
+  font-size: 12px;
+  margin-bottom:0;
+}
+.center {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: justify;
+  color: var(--color-text-gray);
+}
+canvas {
+  display: block;
+  width: 100%;
+  box-shadow: var(--shadow-medium);
+  background: var(--color-bg-panel);
+  transform: rotate(180deg);
+}
+#hist {
+  margin-top: 11px;
+  height: 96px;
+  padding: 0 5px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.pill {
+  display: inline-block;
+  padding: 3px 10px 0px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-medium);
+}
+.global, .hist, .buttons {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+.global {
+  margin: 0 auto;
+}
+.global .pill {
+  text-shadow: var(--shadow-soft);
+  box-shadow: none;
+}
+.hist {
+  margin-top: 6px;
+}
+.hist .pill {
+  width: 32%;
+  padding: 5px 10px 6px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-panel);
+  font-size: 12px;
+}
+.pill b {
+  display: inline-block;
+  min-width: 30px;
+  font-weight: 700;
+}
+.pill #best {
+  color: var(--color-text-green);
+}
+.pill #avg {
+  color: var(--color-text-yellow);
+}
+.pill #totalFit {
+  color: var(--color-text-gray);
+}
+button, select {
+  border: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  color: var(--color-text-main);
+  border-radius: var(--radius);
+  text-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-medium);
+}
+button {
+  padding: 5px 18px 8px;
+  background: var(--color-button);
+}
+button:hover {
+  background: var(--color-button-hover);
+}
+select {
+  width: 100%;
+  padding: 5px 8px 8px;
+  background: var(--color-bg-gradient-2);
+}
+input[type=range] {
+  width: 100%;
+}
+
+/* RESPONSYWNOŚĆ – JEDNA KOLUMNA NA TELEFONIE */
+@media screen and (max-width: 1023px) {
+  body {
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+    height: 100%;
+  }
+  #layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  #ui, .mid, #controls {
+    line-height: 1.33;
+    max-width:512px;
+    min-height: 100%;
+    width:auto;
+    min-width: 320px;
+    max-height: 100%;
+  }
+  .center {
+    overflow: visible;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="layout">
+
+  <!-- LEWA KOLUMNA: KONTROLKI -->
+  <div id="ui">
+    <h2>Q-learning w labiryncie</h2>
+    <div><span class="pill">Populacja: <b id="pop">100</b></span><span class="pill">Epizod: <b id="epi">0</b></span></div>
+    <div><span class="pill">Epsilon: <b id="eps">0.450</b></span><span class="pill">Najlepszy czas: <b id="best">—</b></span></div>
+
+    <label>Rozmiar komórki siatki (px)</label>
+    <input id="cellSize" type="range" min="10" max="40" value="20">
+    <div>Wartość: <b id="cellSizeVal">20</b></div>
+
+    <label>Uczenie (alpha)</label>
+    <input id="alpha" type="range" min="1" max="100" value="22">
+    <div>Wartość: <b id="alphaVal">0.22</b></div>
+
+    <label>Zdyskontowanie (gamma)</label>
+    <input id="gamma" type="range" min="900" max="999" value="965">
+    <div>Wartość: <b id="gammaVal">0.965</b></div>
+
+    <label>Epsilon początkowy</label>
+    <input id="epsInit" type="range" min="10" max="100" value="35">
+    <div>Wartość: <b id="epsInitVal">0.35</b></div>
+
+    <label>Spadek eps po epizodzie</label>
+    <input id="epsDecay" type="range" min="990" max="999" value="9925">
+    <div>Wartość: <b id="epsDecayVal">0.9925</b> <span class="hint">(mnożnik)</span></div>
+
+    <div style="margin-top:12px;">
+      <button id="restart">Restart</button>
+      <button id="pause">Pauza</button>
+      <button id="clearQ">Wyczyść Q</button>
+    </div>
+  </div>
+
+  <!-- ŚRODKOWA KOLUMNA: CANVAS -->
+  <div class="mid">
+    <canvas id="cv" width="720" height="520"></canvas>
+  </div>
+
+  <!-- PRAWA KOLUMNA: PEŁNY OPIS, KTÓRY WKLEIŁEŚ -->
+  <div id="controls">
+    <h2>📖 Przewodnik po parametrach</h2>
+
+    <div class="section">
+      <h3>🎯 <u>Epsilon (ε)</u></h3>
+      <p><b>Zakres:</b> 0.02–0.50</p>
+      <p><b>Wpływ:</b> Kontroluje eksplorację vs. eksploatację.</p>
+      <ul>
+        <li><b>Wysokie ε (np. 0.45):</b> Agenci częściej wybierają losowe akcje → lepsze odkrywanie labiryntu, ale wolniejsze uczenie.</li>
+        <li><b>Niskie ε (np. 0.02):</b> Agenci polegają na nauczonej polityce → szybsze działanie, ale ryzyko utknięcia w lokalnym optimum.</li>
+      </ul>
+      <p><b>Założenie Q-learning:</b> Algorytm zakłada, że ε powinno <u>maleć z czasem</u> (eksploracja → eksploatacja). Tutaj ε jest mnożone przez <code>epsDecay</code> po każdym epizodzie.</p>
+    </div>
+
+    <div class="section">
+      <h3>🔄 <u>Alpha (α)</u></h3>
+      <p><b>Zakres:</b> 0.01–1.00</p>
+      <p><b>Wpływ:</b> Szybkość uczenia się.</p>
+      <ul>
+        <li><b>Wysokie α (np. 0.30):</b> Agenci szybko dostosowują Q, ale mogą "przeskakiwać" optymalne rozwiązania.</li>
+        <li><b>Niskie α (np. 0.10):</b> Uczenie się jest stabilne, ale wolne.</li>
+      </ul>
+      <p><b>Założenie Q-learning:</b> W klasycznym Q-learningu α jest stałe. Tutaj jest stałe, ale można je zmieniać dynamicznie (np. malejące α).</p>
+    </div>
+
+    <div class="section">
+      <h3>🔮 <u>Gamma (γ)</u></h3>
+      <p><b>Zakres:</b> 0.900–0.999</p>
+      <p><b>Wpływ:</b> Znaczenie przyszłych nagród.</p>
+      <ul>
+        <li><b>Wysokie γ (np. 0.965):</b> Agenci uwzględniają długoterminowe cele → lepsze planowanie, ale wolniejsze uczenie.</li>
+        <li><b>Niskie γ (np. 0.900):</b> Agenci skupiają się na natychmiastowych nagrodach → szybsze działanie, ale ryzyko "krótkowzroczności".</li>
+      </ul>
+      <p><b>Założenie Q-learning:</b> γ powinno być bliskie 1.0, aby algorytm uwzględniał przyszłe nagrody. Tutaj γ=0.965 jest dobrym kompromisem.</p>
+    </div>
+
+    <div class="section">
+      <h3>📏 <u>Rozmiar komórki (CELL)</u></h3>
+      <p><b>Zakres:</b> 10–40 px</p>
+      <p><b>Wpływ:</b> Rozdzielczość przestrzeni stanów.</p>
+      <ul>
+        <li><b>Mały CELL (np. 10):</b> Dokładniejsza dyskretyzacja → więcej stanów, ale wolniejsze uczenie (przekleństwo wymiarowości).</li>
+        <li><b>Duży CELL (np. 30):</b> Mniej stanów → szybsze uczenie, ale gorsza jakość rozwiązania.</li>
+      </ul>
+      <p><b>Założenie Q-learning:</b> Przestrzeń stanów musi być dyskretna. Tutaj używamy siatki (grid), co jest klasycznym podejściem.</p>
+    </div>
+
+    <div class="section">
+      <h3>⚡ <u>Nagrody i kary</u></h3>
+      <p><b>Krok:</b> <code>-0.018</code> → Mała kara za każdy ruch, aby zachęcić do szybkiego dotarcia do celu.</p>
+      <p><b>Ściana:</b> <code>-10.0</code> → Duża kara, aby unikać kolizji.</p>
+      <p><b>Cel:</b> <code>+35.0</code> → Duża nagroda, aby zrównoważyć kary.</p>
+      <p><b>Timeout:</b> <code>-4.0</code> → Kara za zbyt długi epizod.</p>
+      <p><b>Shaping:</b> <code>(distBefore - distAfter) * 0.12</code> → Dodatkowa nagroda za zbliżanie się do celu.</p>
+      <p><b>Założenie Q-learning:</b> Nagrody muszą być <u>spójne</u> i <u>odzwierciedlać cel</u>. Tutaj używamy "shapingu", aby przyspieszyć uczenie.</p>
+    </div>
+
+    <div class="section">
+      <h3>🔄 <u>Mechanizm Q-learningu</u></h3>
+      <p><b>Założenia klasycznego Q-learningu:</b></p>
+      <ol>
+        <li><b>Środowisko MDP:</b> Labirynt jest <u>Markowowskim Procesem Decyzyjnym</u> (wynik akcji zależy tylko od stanu, nie od historii).</li>
+        <li><b>Pełna obserwowalność:</b> Stan (pozycja na siatce) jest w pełni obserwowalny.</li>
+        <li><b>Stochastyczność:</b> Akcje są deterministyczne (brak szumu), ale kolizje zależą od pozycji.</li>
+        <li><b>Nieskończone epizody:</b> Każdy epizod kończy się śmiercią lub dotarciem do celu.</li>
+      </ol>
+      <p><b>Ulepszenia:</b> Można dodać <u>eligible traces</u> (ścieżki nagród) lub <u>deep Q-learning</u> (DQN) dla ciągłych przestrzeni stanów.  Zrobić wykres spadku epsilon w czasie, porównać różne strategie eksploracji (epsilon‑greedy, softmax, UCB).
+    </div>
+  </div>
+
+</div>
+
+ <script>
+    // --- Parametry ogólne ---
+    const W = 720, H = 520;
+    const POP_SIZE = 100;
+    const SPEED = 3.2;
+    const STEP_LIMIT = 5000;
+
+    const goal = { x: 50, y: H - 50, r: 18 };
+    const start = { x: W - 70, y: 60 };
+
+    const cv = document.getElementById('cv');
+    const ctx = cv.getContext('2d');
+
+    const epiEl = document.getElementById('epi');
+    const popEl = document.getElementById('pop');
+    const epsEl = document.getElementById('eps');
+    const bestEl = document.getElementById('best');
+    const cellSizeEl = document.getElementById('cellSize');
+    const cellSizeValEl = document.getElementById('cellSizeVal');
+    const alphaEl = document.getElementById('alpha');
+    const alphaValEl = document.getElementById('alphaVal');
+    const gammaEl = document.getElementById('gamma');
+    const gammaValEl = document.getElementById('gammaVal');
+    const epsInitEl = document.getElementById('epsInit');
+    const epsInitValEl = document.getElementById('epsInitVal');
+    const epsDecayEl = document.getElementById('epsDecay');
+    const epsDecayValEl = document.getElementById('epsDecayVal');
+
+    const btnRestart = document.getElementById('restart');
+    const btnPause   = document.getElementById('pause');
+    const btnClearQ  = document.getElementById('clearQ');
+
+    popEl.textContent = POP_SIZE;
+
+    // ==================== ZOPTYMALIZOWANE PARAMETRY ====================
+    let CELL = 20;
+    let ALPHA = 0.22;
+    let GAMMA = 0.965;
+    let EPS = 0.35;
+    let EPS_DECAY = 0.9925;
+
+    const REWARD_GOAL = 35.0;
+    const PENALTY_STEP = -0.018;
+    const PENALTY_WALL = -10.0;
+    const PENALTY_TIMEOUT = -4.0;
+    const SHAPING_FACTOR = 0.12;
+    // ===================================================================
+
+    // Inicjalizacja wartości w UI
+    cellSizeValEl.textContent = CELL;
+    alphaValEl.textContent = ALPHA.toFixed(2);
+    gammaValEl.textContent = GAMMA.toFixed(3);
+    epsInitValEl.textContent = EPS.toFixed(2);
+    epsDecayValEl.textContent = EPS_DECAY.toFixed(4);
+    epsEl.textContent = EPS.toFixed(3);
+
+    cellSizeEl.value = CELL;
+    alphaEl.value = ALPHA * 100;
+    gammaEl.value = GAMMA * 1000;
+    epsInitEl.value = EPS * 100;
+    epsDecayEl.value = Math.round(EPS_DECAY * 1000);
+
+    // Obsługa sliderów
+    cellSizeEl.oninput = () => { CELL = +cellSizeEl.value; cellSizeValEl.textContent = CELL; };
+    alphaEl.oninput = () => { ALPHA = +alphaEl.value/100; alphaValEl.textContent = ALPHA.toFixed(2); };
+    gammaEl.oninput = () => { GAMMA = +gammaEl.value/1000; gammaValEl.textContent = GAMMA.toFixed(3); };
+    epsInitEl.oninput = () => { 
+        EPS = +epsInitEl.value/100; 
+        epsInitValEl.textContent = EPS.toFixed(2); 
+        epsEl.textContent = EPS.toFixed(3);
+    };
+    epsDecayEl.oninput = () => { 
+        EPS_DECAY = +epsDecayEl.value/1000; 
+        epsDecayValEl.textContent = EPS_DECAY.toFixed(4); 
+    };
+
+    btnClearQ.onclick = () => { Q.clear(); };
+    btnRestart.onclick = () => { 
+        resetAgents(true); 
+        EPS = +epsInitEl.value/100; 
+        epsEl.textContent = EPS.toFixed(3);
+    };
+
+    let paused = false;
+    btnPause.onclick = () => { 
+        paused = !paused; 
+        btnPause.textContent = paused ? 'Wznów' : 'Pauza'; 
+    };
+
+    // --- Labirynt ---
+    const walls = [
+      {x: 0, y: 0, w: W, h: 20},
+      {x: 0, y: H-20, w: W, h: 20},
+      {x: 0, y: 0, w: 20, h: H},
+      {x: W-20, y: 0, w: 20, h: H},
+
+      {x: 120, y: 80, w: 480, h: 20},
+      {x: 120, y: 80, w: 20, h: 300},
+      {x: 120, y: 360, w: 400, h: 20},
+      {x: 500, y: 140, w: 20, h: 240},
+      {x: 260, y: 140, w: 260, h: 20},
+      {x: 260, y: 200, w: 20, h: 160},
+      {x: 320, y: 260, w: 180, h: 20},
+    ];
+
+    function drawMaze() {
+      ctx.fillStyle = '#222';
+      ctx.fillRect(0, 0, W, H);
+
+      // Cel
+      ctx.beginPath();
+      ctx.fillStyle = '#2ecc71';
+      ctx.arc(goal.x, goal.y, goal.r, 0, Math.PI*2);
+      ctx.fill();
+
+      // Start
+      ctx.beginPath();
+      ctx.fillStyle = '#3498db';
+      ctx.arc(start.x, start.y, 9, 0, Math.PI*2);
+      ctx.fill();
+
+      // Ściany
+      ctx.fillStyle = '#777';
+      for (const w of walls) ctx.fillRect(w.x, w.y, w.w, w.h);
+
+      // Siatka
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      for (let x = 20; x <= W-20; x += CELL) {
+        ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, H-20); ctx.stroke();
+      }
+      for (let y = 20; y <= H-20; y += CELL) {
+        ctx.beginPath(); ctx.moveTo(20, y); ctx.lineTo(W-20, y); ctx.stroke();
+      }
+    }
+
+    function collides(x, y, r = 4) {
+      for (const w of walls) {
+        const nx = Math.max(w.x, Math.min(x, w.x + w.w));
+        const ny = Math.max(w.y, Math.min(y, w.y + w.h));
+        const dx = x - nx, dy = y - ny;
+        if (dx*dx + dy*dy <= r*r) return true;
+      }
+      if (x < 24 || x > W-24 || y < 24 || y > H-24) return true;
+      return false;
+    }
+
+    function toCell(x, y) {
+      const gx = Math.max(20, Math.min(x, W-21));
+      const gy = Math.max(20, Math.min(y, H-21));
+      const cx = Math.floor((gx-20) / CELL);
+      const cy = Math.floor((gy-20) / CELL);
+      return { cx, cy, key: cx + ',' + cy };
+    }
+
+    function atGoal(x, y) {
+      const dx = x - goal.x, dy = y - goal.y;
+      return dx*dx + dy*dy <= goal.r * goal.r;
+    }
+
+    const ACTIONS = [
+      {dx: 0,  dy: -1}, // góra
+      {dx: 0,  dy:  1}, // dół
+      {dx:-1,  dy:  0}, // lewo
+      {dx: 1,  dy:  0}  // prawo
+    ];
+
+    // Tablica Q
+    const Q = new Map();
+    function ensureQ(key) {
+      if (!Q.has(key)) Q.set(key, new Float32Array(4).fill(0));
+      return Q.get(key);
+    }
+
+    function pickAction(stateKey, eps) {
+      const q = ensureQ(stateKey);
+      if (Math.random() < eps) return Math.floor(Math.random() * 4);
+      
+      let bestA = 0, bestQ = q[0];
+      for (let a = 1; a < 4; a++) {
+        if (q[a] > bestQ) { bestQ = q[a]; bestA = a; }
+      }
+      return bestA;
+    }
+
+    function maxQ(stateKey) {
+      const q = ensureQ(stateKey);
+      let m = q[0];
+      for (let a = 1; a < 4; a++) if (q[a] > m) m = q[a];
+      return m;
+    }
+
+    class Agent {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = start.x;
+        this.y = start.y;
+        this.r = 4;
+        this.dead = false;
+        this.reached = false;
+        this.steps = 0;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = this.reached ? '#2ecc71' : (this.dead ? '#e74c3c' : '#ecf0f1');
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    let agents = [];
+    let episode = 0;
+    let bestTime = null;
+
+    function resetAgents(hard = false) {
+      if (hard) {
+        episode = 0;
+        bestTime = null;
+        Q.clear();
+      }
+      agents = new Array(POP_SIZE).fill(0).map(() => new Agent());
+      epiEl.textContent = episode;
+      bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
+    }
+
+    function qUpdate(sKey, a, r, sNextKey, terminal = false) {
+      const q = ensureQ(sKey);
+      const target = terminal ? r : (r + GAMMA * maxQ(sNextKey));
+      q[a] += ALPHA * (target - q[a]);
+    }
+
+    function loop() {
+      drawMaze();
+
+      if (!paused) {
+        for (const ag of agents) {
+          if (ag.dead || ag.reached) {
+            ag.draw();
+            continue;
+          }
+
+          const s = toCell(ag.x, ag.y);
+          const a = pickAction(s.key, EPS);
+          const move = ACTIONS[a];
+          const nx = ag.x + move.dx * SPEED;
+          const ny = ag.y + move.dy * SPEED;
+
+          let r = PENALTY_STEP;
+          let terminal = false;
+          let nextKey = null;
+
+          const distBefore = Math.hypot(ag.x - goal.x, ag.y - goal.y);
+
+          if (collides(nx, ny, ag.r)) {
+            r = PENALTY_WALL;
+            terminal = true;
+            nextKey = s.key;
+            ag.dead = true;
+          } else {
+            ag.x = nx;
+            ag.y = ny;
+            const distAfter = Math.hypot(ag.x - goal.x, ag.y - goal.y);
+            
+            r += (distBefore - distAfter) * SHAPING_FACTOR;   // shaping nagród
+
+            if (atGoal(ag.x, ag.y)) {
+              r = REWARD_GOAL;
+              terminal = true;
+              nextKey = toCell(ag.x, ag.y).key;
+              ag.reached = true;
+              if (bestTime == null || ag.steps < bestTime) bestTime = ag.steps;
+            } else {
+              nextKey = toCell(ag.x, ag.y).key;
+            }
+          }
+
+          qUpdate(s.key, a, r, nextKey, terminal);
+
+          ag.steps++;
+          if (ag.steps >= STEP_LIMIT && !ag.reached) {
+            qUpdate(s.key, a, PENALTY_TIMEOUT, s.key, true);
+            ag.dead = true;
+          }
+
+          ag.draw();
+        }
+
+        // Koniec epizodu
+        if (agents.every(a => a.dead || a.reached)) {
+          episode++;
+          epiEl.textContent = episode;
+          bestEl.textContent = bestTime == null ? '—' : bestTime + ' kroków';
+
+          EPS = Math.max(0.02, EPS * EPS_DECAY);
+          epsEl.textContent = EPS.toFixed(3);
+
+          for (const a of agents) a.reset();
+        }
+      } else {
+        for (const ag of agents) ag.draw();
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    resetAgents();
+    loop();
+</script>
+
+</body>
+</html>
