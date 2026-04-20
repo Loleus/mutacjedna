@@ -557,7 +557,7 @@
         <h1>Q-learning i Double Q-Learning w labiryncie</h1>
         <p class="subtle">Symulacja porównuje tablicowy Q-learning z eksploracją sterowaną strategiami. Możesz
           obserwować wpływ polityki eksploracji, śladów kwalifikowalności λ, aproksymacji funkcji wartości oraz
-          złączenie dwóch estymatorów Q w Double Q-Learning.</p>
+          złączenie dwóch estymatorów Q w Double Q-Learning. Dostępne strategie obejmują ε-greedy (klasyczny i dynamiczny z różnymi typami decay), Softmax, UCB, Optimistic initialization, NoisyNet oraz hybrydę UCB + ε-greedy.</p>
       </div>
 
       <div class="status-grid">
@@ -653,15 +653,28 @@
           </label>
           <select id="strategy">
             <option value="epsilon_dynamic">ε-greedy z dynamicznym ε</option>
+            <option value="epsilon">ε-greedy klasyczny</option>
             <option value="softmax">Softmax / Boltzmann</option>
             <option value="optimistic">Optimistic Q-initialization</option>
             <option value="ucb">UCB</option>
             <option value="noisy">NoisyNet-style</option>
+            <option value="hybrid">Hybrydowa (UCB + ε-greedy)</option>
           </select>
         </div>
 
         <div class="section-card strategy-panel" data-strategy="epsilon_dynamic">
           <h3>ε-greedy dynamiczne</h3>
+          <div class="control-group">
+            <label for="epsDecayType">Typ decay ε
+              <span class="badge next">od nast. ep.</span>
+            </label>
+            <select id="epsDecayType">
+              <option value="exponential">Exponential</option>
+              <option value="linear">Linear</option>
+              <option value="inverse">Inverse (1/t)</option>
+              <option value="cosine">Cosine annealing</option>
+            </select>
+          </div>
           <div class="control-group">
             <label for="epsStart">ε start
               <span class="badge rt">real-time</span>
@@ -689,6 +702,17 @@
             </label>
             <input id="epsBoost" type="range" min="0" max="30" step="1" value="8">
             <div class="value-line">Wartość: <b id="epsBoostOut">0.08</b></div>
+          </div>
+        </div>
+
+        <div class="section-card strategy-panel hidden-panel" data-strategy="epsilon">
+          <h3>ε-greedy klasyczny</h3>
+          <div class="control-group">
+            <label for="epsFixed">Epsilon ε
+              <span class="badge rt">real-time</span>
+            </label>
+            <input id="epsFixed" type="range" min="1" max="50" step="1" value="10">
+            <div class="value-line">Wartość: <b id="epsFixedOut">0.10</b></div>
           </div>
         </div>
 
@@ -765,6 +789,24 @@
             <div class="value-line">Wartość: <b id="noisySigmaDecayOut">0.996</b></div>
           </div>
         </div>
+
+        <div class="section-card strategy-panel hidden-panel" data-strategy="hybrid">
+          <h3>Hybrydowa (UCB + ε-greedy)</h3>
+          <div class="control-group">
+            <label for="hybridUcbC">Parametr c UCB
+              <span class="badge reset-q">reset Q</span>
+            </label>
+            <input id="hybridUcbC" type="range" min="5" max="500" step="5" value="150">
+            <div class="value-line">Wartość: <b id="hybridUcbCOut">1.50</b></div>
+          </div>
+          <div class="control-group">
+            <label for="hybridEps">Epsilon ε
+              <span class="badge rt">real-time</span>
+            </label>
+            <input id="hybridEps" type="range" min="1" max="50" step="1" value="10">
+            <div class="value-line">Wartość: <b id="hybridEpsOut">0.10</b></div>
+          </div>
+        </div>
       </section>
     </aside>
 
@@ -833,9 +875,18 @@
         <span class="formula">a = { losowa akcja z prawd. ε, argmaxₐ Q(s,a) w przeciwnym razie }</span>
         <p>Dodany został harmonogram eksploracji z minimalnym ε i wzmocnieniem przy stagnacji. Dzięki temu polityka może
           znów zwiększyć eksplorację, gdy skuteczność epizodów spada.</p>
+        <p>Dostępne typy decay: <b>Linear</b> (ε = ε₀ - k·t), <b>Exponential</b> (ε = ε₀ · decayᵗ), <b>Inverse</b> (ε = ε₀ / (1 + k·t)), <b>Cosine annealing</b> (ε = ε_min + ½(ε₀-ε_min)(1+cos(πt/T))).</p>
         <ul>
+          <li><b>Typ decay ε</b> — <span class="badge next">od nast. ep.</span></li>
           <li><b>ε start</b> — <span class="badge rt">real-time</span></li>
           <li><b>ε min, decay, boost</b> — <span class="badge next">od nast. ep.</span></li>
+        </ul>
+
+        <h3>1.1. ε-greedy klasyczny</h3>
+        <span class="formula">a = { losowa akcja z prawd. ε, argmaxₐ Q(s,a) w przeciwnym razie }</span>
+        <p>Podstawowa strategia ε-greedy bez dynamicznego zmniejszania ε. Stała wartość eksploracji.</p>
+        <ul>
+          <li><b>ε</b> — <span class="badge rt">real-time</span></li>
         </ul>
 
         <h3>2. Softmax / Boltzmann</h3>
@@ -864,6 +915,15 @@
         <ul>
           <li><b>c</b> — <span class="badge rt">real-time</span></li>
           <li><b>Zmiana strategii na UCB</b> — <span class="badge reset-ep">reset epizodów</span></li>
+        </ul>
+
+        <h3>4.1. Hybrydowa (UCB + ε-greedy)</h3>
+        <span class="formula">UCB(s,a) = Q(s,a) + c · √( ln(N(s)+1) / (N(s,a)+1) )</span>
+        <span class="formula">a = { losowa akcja z prawd. ε, argmaxₐ UCB(s,a) w przeciwnym razie }</span>
+        <p>Kombinacja UCB z ε-greedy. Z prawdopodobieństwem ε wybiera losowo, w przeciwnym razie używa UCB do wyboru akcji.</p>
+        <ul>
+          <li><b>c UCB</b> — <span class="badge reset-q">reset Q</span></li>
+          <li><b>ε</b> — <span class="badge rt">real-time</span></li>
         </ul>
 
         <h3>5. NoisyNet-style</h3>
@@ -1026,10 +1086,12 @@
         // Double Q-Learning nowy parametr
         doubleQ: false,
         // ε-greedy
+        epsDecayType: 'exponential',
         epsStart: 0.35,
         epsMin: 0.02,
         epsDecay: 0.992,
         epsBoost: 0.08,
+        epsFixed: 0.10,
         // Softmax
         tempStart: 1.25,
         tempMin: 0.18,
@@ -1041,7 +1103,10 @@
         // NoisyNet
         noisySigma: 0.55,
         noisySigmaMin: 0.05,
-        noisySigmaDecay: 0.996
+        noisySigmaDecay: 0.996,
+        // Hybrid
+        hybridUcbC: 1.50,
+        hybridEps: 0.10
       };
 
       // ============================================================
@@ -1141,10 +1206,12 @@
       function strategyLabel(strategy) {
         switch (strategy) {
           case 'epsilon_dynamic': return 'ε-greedy';
+          case 'epsilon': return 'ε-greedy klasyczny';
           case 'softmax': return 'Softmax';
           case 'optimistic': return 'Optimistic';
           case 'ucb': return 'UCB';
           case 'noisy': return 'NoisyNet';
+          case 'hybrid': return 'Hybrydowa (UCB + ε)';
           default: return strategy;
         }
       }
@@ -1371,6 +1438,13 @@
           return { action: argmaxRandomTie(baseValues), baseValues };
         }
 
+        if (config.strategy === 'epsilon') {
+          if (Math.random() < config.epsFixed) {
+            return { action: randInt(4), baseValues };
+          }
+          return { action: argmaxRandomTie(baseValues), baseValues };
+        }
+
         if (config.strategy === 'softmax') {
           const probs = softmax(baseValues, runtime.temperatureCurrent);
           return { action: sampleDiscrete(probs), baseValues };
@@ -1392,6 +1466,21 @@
           return { action: argmaxRandomTie(scores), baseValues };
         }
 
+        if (config.strategy === 'hybrid') {
+          const counts = ensureCounts(rep.countKey);
+          let total = 0;
+          for (let i = 0; i < 4; i++) total += counts[i];
+          const scores = new Float32Array(4);
+          const bonusBase = config.hybridUcbC * Math.sqrt(Math.log(total + 2));
+          for (let i = 0; i < 4; i++) {
+            scores[i] = baseValues[i] + bonusBase / Math.sqrt(counts[i] + 1);
+          }
+          if (Math.random() < config.hybridEps) {
+            return { action: randInt(4), baseValues };
+          }
+          return { action: argmaxRandomTie(scores), baseValues };
+        }
+
         // NoisyNet-style
         const noisyScores = new Float32Array(4);
         for (let i = 0; i < 4; i++) {
@@ -1404,12 +1493,16 @@
         switch (config.strategy) {
           case 'epsilon_dynamic':
             return { text: 'ε = ' + runtime.epsilonCurrent.toFixed(3), norm: clamp(runtime.epsilonCurrent, 0, 1) };
+          case 'epsilon':
+            return { text: 'ε = ' + config.epsFixed.toFixed(3), norm: clamp(config.epsFixed, 0, 1) };
           case 'softmax':
             return { text: 'τ = ' + runtime.temperatureCurrent.toFixed(3), norm: clamp(runtime.temperatureCurrent / 3, 0, 1) };
           case 'optimistic':
             return { text: 'Q₀ = ' + config.optimisticInit.toFixed(2), norm: clamp(config.optimisticInit / 8, 0, 1) };
           case 'ucb':
             return { text: 'c = ' + config.ucbC.toFixed(2), norm: clamp(config.ucbC / 4, 0, 1) };
+          case 'hybrid':
+            return { text: 'c=' + config.hybridUcbC.toFixed(2) + ' ε=' + config.hybridEps.toFixed(3), norm: clamp(config.hybridEps, 0, 1) };
           case 'noisy':
             return { text: 'σ = ' + runtime.noiseSigmaCurrent.toFixed(3), norm: clamp(runtime.noiseSigmaCurrent / 1.5, 0, 1) };
           default:
@@ -1419,7 +1512,25 @@
 
       function advanceExplorationSchedule(successRate) {
         if (config.strategy === 'epsilon_dynamic') {
-          let nextEps = Math.max(config.epsMin, runtime.epsilonCurrent * config.epsDecay);
+          let t = runtime.episode;
+          let decayFactor;
+          switch (config.epsDecayType) {
+            case 'linear':
+              decayFactor = Math.max(0, 1 - t * 0.001 * (1 - config.epsDecay));
+              break;
+            case 'exponential':
+              decayFactor = Math.pow(config.epsDecay, t);
+              break;
+            case 'inverse':
+              decayFactor = 1 / (1 + t * 0.001 * (1 - config.epsDecay));
+              break;
+            case 'cosine':
+              decayFactor = 0.5 * (1 + Math.cos(Math.PI * t / 1000));
+              break;
+            default:
+              decayFactor = Math.pow(config.epsDecay, t);
+          }
+          let nextEps = config.epsMin + (config.epsStart - config.epsMin) * decayFactor;
           nextEps += Math.max(0, 0.18 - successRate) * config.epsBoost;
           runtime.epsilonCurrent = clamp(nextEps, config.epsMin, 0.98);
         } else if (config.strategy === 'softmax') {
@@ -1892,6 +2003,11 @@
         $('epsBoost').value = Math.round(config.epsBoost * 100);
         $('epsBoostOut').textContent = config.epsBoost.toFixed(2);
 
+        $('epsFixed').value = Math.round(config.epsFixed * 100);
+        $('epsFixedOut').textContent = config.epsFixed.toFixed(2);
+
+        $('epsDecayType').value = config.epsDecayType;
+
         $('tempStart').value = Math.round(config.tempStart * 100);
         $('tempStartOut').textContent = config.tempStart.toFixed(2);
         $('tempMin').value = Math.round(config.tempMin * 100);
@@ -1904,6 +2020,11 @@
 
         $('ucbC').value = Math.round(config.ucbC * 100);
         $('ucbCOut').textContent = config.ucbC.toFixed(2);
+
+        $('hybridUcbC').value = Math.round(config.hybridUcbC * 100);
+        $('hybridUcbCOut').textContent = config.hybridUcbC.toFixed(2);
+        $('hybridEps').value = Math.round(config.hybridEps * 100);
+        $('hybridEpsOut').textContent = config.hybridEps.toFixed(2);
 
         $('noisySigma').value = Math.round(config.noisySigma * 100);
         $('noisySigmaOut').textContent = config.noisySigma.toFixed(2);
@@ -1986,6 +2107,18 @@
           $('epsBoostOut').textContent = config.epsBoost.toFixed(2);
         });
 
+        $('epsFixed').addEventListener('input', (e) => {
+          config.epsFixed = +e.target.value / 100;
+          $('epsFixedOut').textContent = config.epsFixed.toFixed(2);
+          updateStatus();
+        });
+
+        $('epsDecayType').addEventListener('change', (e) => {
+          config.epsDecayType = e.target.value;
+          resetExplorationSchedulers();
+          resetEpisodesOnly();
+        });
+
         $('tempStart').addEventListener('input', (e) => {
           config.tempStart = +e.target.value / 100;
           runtime.temperatureCurrent = config.tempStart;
@@ -2012,6 +2145,18 @@
         $('ucbC').addEventListener('input', (e) => {
           config.ucbC = +e.target.value / 100;
           $('ucbCOut').textContent = config.ucbC.toFixed(2);
+          updateStatus();
+        });
+
+        $('hybridUcbC').addEventListener('input', (e) => {
+          config.hybridUcbC = +e.target.value / 100;
+          $('hybridUcbCOut').textContent = config.hybridUcbC.toFixed(2);
+          updateStatus();
+        });
+
+        $('hybridEps').addEventListener('input', (e) => {
+          config.hybridEps = +e.target.value / 100;
+          $('hybridEpsOut').textContent = config.hybridEps.toFixed(2);
           updateStatus();
         });
 
