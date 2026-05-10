@@ -22,17 +22,27 @@
         <span class="pill">Całkowity<br><b id="totalFit">0.000</b></span>
       </div>
     </div>
+    <!-- Domyślne wartości pól: zsynchronizuj z DEFAULT_* w index.js (skrypt nadpisuje UI przy każdym starcie). -->
     <div class="params">
-      <label><b>Długość DNA</b> (kroki)</label>
-      <span>: <b id="dnaLenVal">400</b></span>
+      <div class="paramLine">
+        
+        <label><b>Długość DNA</b> (kroki)</label>
+        <span><b id="dnaLenVal">400</b></span>
+      </div>
       <input id="dnaLen" type="range" min="50" max="1000" value="400">
 
-      <label><b>Mutacja</b> (%)</label>
-      <span>: <b id="mutRateVal">10</b></span>
+      <div class="paramLine">
+        
+        <label><b>Mutacja</b></label>
+        <span><b id="mutRateVal">10</b></span>
+      </div>
       <input id="mutRate" type="range" min="0" max="20" value="10">
 
-      <label><b>Elitaryzm</b> (ile najlepszych)</label>
-      <span>: <b id="eliteVal">2</b></span>
+      <div class="paramLine">
+        
+        <label><b>Elitaryzm</b> (ile najlepszych)</label>
+        <span><b id="eliteVal">2</b></span>
+      </div>
       <input id="elite" type="range" min="1" max="25" value="2">
 
       <label><b>Metoda selekcji</b></label>
@@ -43,8 +53,14 @@
         <option value="rank">Ranking (rank)</option>
       </select>
 
-      <label><b>Rozmiar turnieju</b> </label>
-      <span>: <b id="tournamentSizeVal">15</b></span>
+      <div class="paramLine">
+
+      </div>
+      <div class="paramLine">
+
+        <label><b>Rozmiar turnieju</b> </label>
+        <span><b id="tournamentSizeVal">15</b></span>
+      </div>
 
       <input id="tournamentSize" type="range" min="2" max="50" value="15" />
       <label><input id="tournamentNoReplace" type="checkbox" /> bez powtórzeń</label>

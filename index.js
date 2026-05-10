@@ -4,9 +4,19 @@
 const W = 280, H = 280; // nowy rozmiar canvasa
 const WALL_THICK = 5; // grubość ścian w px
 const POP_SIZE = 100;
-let DNA_LEN = 400;
-let MUT_RATE = 0.05;
-let ELITE_COUNT = 5;
+
+/** Domyślne wartości UI — źródło prawdy przy każdym starcie (nadpisuje przywracanie formularza przez przeglądarkę). */
+const DEFAULT_DNA_LEN = 400;
+const DEFAULT_MUT_PERCENT = 10;
+const DEFAULT_ELITE_COUNT = 2;
+const DEFAULT_SEL_METHOD = 'roulette';
+const DEFAULT_TOURNAMENT_K = 15;
+const DEFAULT_TOURNAMENT_NO_REPLACE = false;
+const DEFAULT_SHOW_TRAILS = true;
+
+let DNA_LEN = DEFAULT_DNA_LEN;
+let MUT_RATE = DEFAULT_MUT_PERCENT / 100;
+let ELITE_COUNT = DEFAULT_ELITE_COUNT;
 
 // stałe rozmiary markerów niezależne od poprzedniego rozmiaru
 const START_R = 6;
@@ -53,9 +63,38 @@ const totalFitEl = document.getElementById('totalFit');
 const tournamentSizeEl = document.getElementById('tournamentSize');
 const tournamentSizeValEl = document.getElementById('tournamentSizeVal');
 const tournamentNoReplaceEl = document.getElementById('tournamentNoReplace');
-// domyślna wartość (zgodna z dotychczasowym zachowaniem)
-let TOURNAMENT_K = tournamentSizeEl ? Number(tournamentSizeEl.value) : 5;
-let TOURNAMENT_NO_REPLACE = tournamentNoReplaceEl ? tournamentNoReplaceEl.checked : false;
+let TOURNAMENT_K = DEFAULT_TOURNAMENT_K;
+let TOURNAMENT_NO_REPLACE = DEFAULT_TOURNAMENT_NO_REPLACE;
+
+function applyUiDefaults() {
+  DNA_LEN = DEFAULT_DNA_LEN;
+  MUT_RATE = DEFAULT_MUT_PERCENT / 100;
+  ELITE_COUNT = DEFAULT_ELITE_COUNT;
+  TOURNAMENT_NO_REPLACE = DEFAULT_TOURNAMENT_NO_REPLACE;
+
+  if (dnaLenEl) {
+    dnaLenEl.value = String(DEFAULT_DNA_LEN);
+    dnaLenValEl.textContent = String(DEFAULT_DNA_LEN);
+  }
+  if (mutRateEl) {
+    mutRateEl.value = String(DEFAULT_MUT_PERCENT);
+    mutRateValEl.textContent = `${DEFAULT_MUT_PERCENT}%`;
+  }
+  if (eliteEl) {
+    eliteEl.value = String(DEFAULT_ELITE_COUNT);
+    eliteValEl.textContent = String(DEFAULT_ELITE_COUNT);
+  }
+  if (selMethodEl) selMethodEl.value = DEFAULT_SEL_METHOD;
+  if (tournamentSizeEl && tournamentSizeValEl) {
+    tournamentSizeEl.value = String(DEFAULT_TOURNAMENT_K);
+    tournamentSizeValEl.textContent = String(DEFAULT_TOURNAMENT_K);
+    TOURNAMENT_K = Math.max(2, Math.min(POP_SIZE, Number(tournamentSizeEl.value)));
+  }
+  if (tournamentNoReplaceEl) tournamentNoReplaceEl.checked = DEFAULT_TOURNAMENT_NO_REPLACE;
+  if (showTrailsEl) showTrailsEl.checked = DEFAULT_SHOW_TRAILS;
+}
+
+applyUiDefaults();
 
 if (tournamentSizeEl) {
   tournamentSizeEl.oninput = () => {
@@ -69,7 +108,7 @@ if (tournamentNoReplaceEl) {
 
 // Obsługa UI
 dnaLenEl.oninput = () => { DNA_LEN = +dnaLenEl.value; dnaLenValEl.textContent = DNA_LEN; resetPopulation(); };
-mutRateEl.oninput = () => { MUT_RATE = +mutRateEl.value / 100; mutRateValEl.textContent = Math.round(MUT_RATE * 100); };
+mutRateEl.oninput = () => { MUT_RATE = +mutRateEl.value / 100; mutRateValEl.textContent = Math.round(MUT_RATE * 100) + "%"; };
 eliteEl.oninput = () => { ELITE_COUNT = +eliteEl.value; eliteValEl.textContent = ELITE_COUNT; };
 btnRestart.onclick = () => resetPopulation(true);
 let paused = false;

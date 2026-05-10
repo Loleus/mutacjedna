@@ -54,6 +54,7 @@ body {
 #ui {
   gap:7px;
   line-height: 1.33;
+  padding: 5px;
 }
 .mid {
   gap: 18px;
@@ -191,7 +192,12 @@ select {
 input[type=range] {
   width: 100%;
 }
-
+.paramLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0 4px;
+}
 @media screen and (max-width: 1023px) {
   body {
     flex-direction: column;
